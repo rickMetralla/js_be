@@ -14,7 +14,6 @@ public class ProductController {
     @Autowired
     ProductService service;
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/product/{id}", method = RequestMethod.GET)
     public ResponseEntity<Product> getProductById(@PathVariable Integer id){
         Product oneProd = service.findById(id);
@@ -26,20 +25,17 @@ public class ProductController {
         }
     }
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/products", method = RequestMethod.GET)
     public ResponseEntity<Iterable<Product>> getProducts(){
         return new ResponseEntity<Iterable<Product>>(service.getAll(), HttpStatus.OK);
     }
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/product", method = RequestMethod.POST)
     public ResponseEntity<String> createProduct(@RequestBody Product product){
         service.create(product);
         return new ResponseEntity<String>("Product created successfully", HttpStatus.CREATED);
     }
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/product", method = RequestMethod.PUT)
     public ResponseEntity<String> updateProduct(@RequestBody Product updatedProduct){
         if(service.findById(updatedProduct.getId()) == null){
@@ -51,7 +47,6 @@ public class ProductController {
         }
     }
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/product/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteProduct(@PathVariable Integer id){
         if(service.findById(id) == null){

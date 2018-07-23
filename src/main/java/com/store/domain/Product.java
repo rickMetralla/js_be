@@ -40,14 +40,6 @@ public class Product {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date dateCreated;
 
-    @Column(name = "date_purchased")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date datePurchased;
-
-//    @JsonIgnore
-//    @ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy = "products")
-//    private Set<Customer> customers;
-
     public String getModel() {
         return model;
     }
@@ -77,22 +69,6 @@ public class Product {
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
     }
-
-    public Date getDatePurchased() {
-        return datePurchased;
-    }
-
-    public void setDatePurchased(Date datePurchased) {
-        this.datePurchased = datePurchased;
-    }
-
-//    public Set<Customer> getCustomers() {
-//        return customers;
-//    }
-//
-//    public void setCustomers(Set<Customer> customers) {
-//        this.customers = customers;
-//    }
 
     public int getAmount() {
         return amount;

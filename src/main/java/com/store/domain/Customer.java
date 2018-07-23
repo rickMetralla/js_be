@@ -26,15 +26,7 @@ public class Customer {
     @Column(name = "email")
     private String email;
 
-//    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable( name = "cust_prod",
-                joinColumns = { @JoinColumn(name = "cust_dni", referencedColumnName = "dni") },
-                inverseJoinColumns = { @JoinColumn(name = "prod_id", referencedColumnName = "id") })
-    private List<Product> products;
-
-    @Column(name = "winner")
-    private boolean winner;
+//    private List<Product> products;
 
     public String getName() {
         return name;
@@ -76,19 +68,12 @@ public class Customer {
         this.email = email;
     }
 
-    public List<Product> getProducts() {
-        return products;
-    }
+//    public List<Product> getProducts() {
+//        return products;
+//    }
+//
+//    public void setProducts(List<Product> products) {
+//        this.products = products;
+//    }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
-    public boolean isWinner() {
-        return winner;
-    }
-
-    public void setWinner(boolean winner) {
-        this.winner = winner;
-    }
 }

@@ -13,7 +13,6 @@ public class CustomerController {
     @Autowired
     CustomerService service;
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/customer/{dni}", method = RequestMethod.GET)
     public ResponseEntity<Customer> getCustomerById(@PathVariable Integer dni){
         Customer one = service.findByDni(dni);
@@ -25,20 +24,17 @@ public class CustomerController {
         }
     }
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/customers", method = RequestMethod.GET)
     public ResponseEntity<Iterable<Customer>> getCustomers(){
         return new ResponseEntity<Iterable<Customer>>(service.getAll(), HttpStatus.OK);
     }
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/customer/", method = RequestMethod.POST)
     public ResponseEntity<String> createCustomer(@RequestBody Customer customer){
         service.create(customer);
         return new ResponseEntity<String>("Customer created successfully", HttpStatus.CREATED);
     }
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/customer/", method = RequestMethod.PUT)
     public ResponseEntity<String> updateCustomer(@RequestBody Customer updatedCustomer){
         if(service.findByDni(updatedCustomer.getDni()) == null){
@@ -50,7 +46,6 @@ public class CustomerController {
         }
     }
 
-    //@CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value = "/customer/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteCustomer(@PathVariable Integer id){
         if(service.findByDni(id) == null){
