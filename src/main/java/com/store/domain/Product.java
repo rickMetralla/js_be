@@ -22,6 +22,7 @@ public class Product {
     private String name;
 
     @Id
+//    @ManyToOne
     @SequenceGenerator(name="product_id_seq",
             sequenceName="product_id_seq",
             allocationSize = 1)

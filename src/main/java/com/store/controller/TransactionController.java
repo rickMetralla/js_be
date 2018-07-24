@@ -1,5 +1,6 @@
 package com.store.controller;
 
+import com.store.domain.Order;
 import com.store.domain.Transaction;
 import com.store.domain.Customer;
 import com.store.service.TransactionService;
@@ -46,7 +47,10 @@ public class TransactionController {
     }
 
     private void saveTransactionForCustomer(Transaction transaction) {
-        service.createBuy(transaction);
+        for (Order or: transaction.getOrders()){
+            transaction.setOrder(or);
+            service.createBuy(transaction);
+        }
     }
 
 

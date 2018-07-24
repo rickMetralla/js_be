@@ -29,23 +29,39 @@ public class Transaction implements Serializable {
 //    private
 //    int prodId;
 
-    @Column(name = "prod_id")
-//    @OneToMany(targetEntity = Product.class)
+//    @Column(name = "prod_id")
+////    @OneToMany(targetEntity = Product.class)
 //    @OneToMany
-    @ManyToOne
-//    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-//    @JoinColumn(table = "product", referencedColumnName = "id")
-
+////    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
+////    @JoinColumn(table = "product", referencedColumnName = "id")
+//
+////    @JoinTable(name="transaction",
+////            joinColumns=@JoinColumn(name="prod_id", referencedColumnName="id"),
+////            inverseJoinColumns=@JoinColumn(name="tag_name", referencedColumnName="name"))
 //    @JoinTable(name="transaction",
-//            joinColumns=@JoinColumn(name="prod_id", referencedColumnName="id"),
-//            inverseJoinColumns=@JoinColumn(name="tag_name", referencedColumnName="name"))
-    @JoinTable(name="transaction",
-            joinColumns=@JoinColumn(table = "product", name="prod_id", referencedColumnName="id"))
-    private List<Product> products;
+//            joinColumns=@JoinColumn(table = "product", name="prod_id", referencedColumnName="id"))
+//    private List<Product> products;
+
+//    @Transient
+////    @ElementCollection
+//    private
+//    List<Order> orders;
+
+    @Embedded
+    private Order order;
 
     @Column(name = "purchased_at")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
     private Date purchasedAt;
+
+    public Transaction (){
+    }
+
+    public Transaction (int custDni, Order order, Date purchasedAt){
+        this.custDni = custDni;
+        this.setOrder(order);
+        this. purchasedAt = purchasedAt;
+    }
 
     public int getId() {
         return id;
@@ -75,11 +91,29 @@ public class Transaction implements Serializable {
         this.purchasedAt = purchasedAt;
     }
 
-    public List<Product> getProducts() {
-        return products;
+//    public List<Order> getOrders() {
+//        return orders;
+//    }
+//
+//    public void setOrders(List<Order> orders) {
+//        this.orders = orders;
+//    }
+
+    public Order getOrder() {
+        return order;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setOrder(Order order) {
+        this.order = order;
     }
+
+//    public List<Product> getProducts() {
+//        return products;
+//    }
+//
+//    public void setProducts(List<Product> products) {
+//        this.products = products;
+//    }
+
+
 }
