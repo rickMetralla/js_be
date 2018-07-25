@@ -59,7 +59,7 @@ public class Transaction implements Serializable {
 
     public Transaction (int custDni, Order order, Date purchasedAt){
         this.custDni = custDni;
-        this.setOrder(order);
+        this.order = order;
         this. purchasedAt = purchasedAt;
     }
 

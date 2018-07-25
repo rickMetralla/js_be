@@ -3,6 +3,8 @@ package com.store.controller;
 import com.store.domain.Order;
 import com.store.domain.Transaction;
 import com.store.domain.Customer;
+import com.store.dto.CustomerPurchase;
+import com.store.dto.ProductOrder;
 import com.store.service.TransactionService;
 import com.store.service.CustomerService;
 import com.store.utils.DrawUtil;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +26,13 @@ public class TransactionController {
     @Autowired
     CustomerService customerService;
 
-    @RequestMapping(value = "/buy", method = RequestMethod.POST)
-    public ResponseEntity<String> createPurchase(@RequestBody Transaction transaction){
-        saveTransactionForCustomer(transaction);
+    @RequestMapping(value = "/purchase", method = RequestMethod.POST)
+    public ResponseEntity<String> createPurchase(@RequestBody CustomerPurchase customerPurchase){
+        saveTransactionForCustomer(customerPurchase);
         return new ResponseEntity<String>("successfully created", HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/buyers", method = RequestMethod.GET)
+    @RequestMapping(value = "/purchasers", method = RequestMethod.GET)
     public ResponseEntity<Iterable<Transaction>> getBuyers(){
         Iterable<Transaction> transaction = service.getAll();
         return new ResponseEntity<Iterable<Transaction>>(transaction, HttpStatus.OK);
@@ -46,9 +49,10 @@ public class TransactionController {
         return new ResponseEntity<Iterable<Transaction>>(ucst, HttpStatus.OK);
     }
 
-    private void saveTransactionForCustomer(Transaction transaction) {
-        for (Order or: transaction.getOrders()){
-            transaction.setOrder(or);
+    private void saveTransactionForCustomer(CustomerPurchase cp) {
+        for (ProductOrder po: cp.getProductOrders()){
+            Order order = new Order(po.getProdId(), po.getAmount());
+            Transaction transaction = new Transaction(cp.getCustDni(), order, cp.getPurchasedAt());
             service.createBuy(transaction);
         }
     }
