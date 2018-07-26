@@ -1,6 +1,7 @@
 package com.store.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.store.domain.Order;
 
 public class ProductOrder {
 
@@ -9,6 +10,19 @@ public class ProductOrder {
 
     @JsonProperty
     private int amount;
+
+    public ProductOrder(){
+    }
+
+    public ProductOrder(int prodId, int amount){
+        this.prodId = prodId;
+        this.amount = amount;
+    }
+
+    public ProductOrder (Order order){
+        this.prodId = order.getProdId();
+        this.amount = order.getAmount();
+    }
 
     public int getProdId() {
         return prodId;

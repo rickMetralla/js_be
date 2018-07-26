@@ -3,6 +3,7 @@ package com.store.controller;
 import com.store.domain.Order;
 import com.store.domain.Transaction;
 import com.store.domain.Customer;
+import com.store.dto.CustomerOrder;
 import com.store.dto.CustomerPurchase;
 import com.store.dto.ProductOrder;
 import com.store.service.TransactionService;
@@ -13,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,27 +33,35 @@ public class TransactionController {
     }
 
     @RequestMapping(value = "/purchasers", method = RequestMethod.GET)
-    public ResponseEntity<Iterable<Transaction>> getBuyers(){
+    public ResponseEntity<Iterable<CustomerPurchase>> getPurchasers(){
         Iterable<Transaction> transaction = service.getAll();
-        return new ResponseEntity<Iterable<Transaction>>(transaction, HttpStatus.OK);
+        Iterable<CustomerPurchase> normalizedTransaction = normalizeTransaction(transaction);
+        return new ResponseEntity<Iterable<CustomerPurchase>>(normalizedTransaction , HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/purchase/{dni}", method = RequestMethod.GET)
+    public ResponseEntity<Transaction> getPurchase(){
+        return null;
+    }
+
+
 
     @RequestMapping(value = "/abuyers", method = RequestMethod.GET)
     public ResponseEntity<Iterable<Transaction>> getAvailableBuyers(){
         Iterable<Transaction> transaction = service.getAll();
 
         Iterable<Integer> availables = DrawUtil.getDniCustomers(transaction );
-
         Iterable<Transaction> ucst = getAvalaible(availables);
-
         return new ResponseEntity<Iterable<Transaction>>(ucst, HttpStatus.OK);
     }
 
     private void saveTransactionForCustomer(CustomerPurchase cp) {
-        for (ProductOrder po: cp.getProductOrders()){
-            Order order = new Order(po.getProdId(), po.getAmount());
-            Transaction transaction = new Transaction(cp.getCustDni(), order, cp.getPurchasedAt());
-            service.createBuy(transaction);
+        for (CustomerOrder po: cp.getCustomerOrders()){
+            for (ProductOrder pOrder: po.getProductOrders()) {
+                Order order = new Order(pOrder.getProdId(), pOrder.getAmount());
+                Transaction transaction = new Transaction(cp.getCustDni(), order, po.getPurchasedAt());
+                service.createBuy(transaction);
+            }
         }
     }
 
@@ -82,6 +90,43 @@ public class TransactionController {
 //        updateLuckyCustomer(luckyCustomer);
 //        return new ResponseEntity<Customer>(luckyCustomer, HttpStatus.OK);
 //    }
+
+    private Iterable<CustomerPurchase> normalizeTransaction(Iterable<Transaction> transactions){
+        List<CustomerPurchase> result = new ArrayList<>();
+        for (Transaction tr : transactions){
+           loadTransaction(tr, result);
+        }
+        return result;
+    }
+
+    private void loadTransaction(Transaction tr, List<CustomerPurchase> result) {
+        int indexCustomer = getIndexCustomer(tr.getCustDni(), result);
+        if (indexCustomer > -1) {
+            ProductOrder prod = new ProductOrder(tr.getOrder());
+            //result.get(indexCustomer).getProductOrders().add(prod); //need improvements
+        } else {
+            List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
+                add(new ProductOrder(tr.getOrder()));
+            }};
+
+            List<CustomerOrder> listCustomerOrders = new ArrayList<CustomerOrder>() {{
+                add(new CustomerOrder(lpo, tr.getPurchasedAt()));
+            }};
+            CustomerPurchase cp = new CustomerPurchase(tr.getCustDni(), listCustomerOrders);
+            result.add(cp);
+        }
+    }
+
+    private int getIndexCustomer(int custDni, List<CustomerPurchase> result) {
+        if(!result.isEmpty()){
+            for (CustomerPurchase cp : result) {
+                if (cp.getCustDni() == custDni){
+                    return result.indexOf(cp);
+                }
+            }
+        }
+        return -1;
+    }
 
     private void updateLuckyCustomer(Customer luckyCustomer) {
         //luckyCustomer.setWinner(true);
