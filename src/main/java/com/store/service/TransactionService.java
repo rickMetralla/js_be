@@ -5,6 +5,8 @@ import com.store.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TransactionService {
 
@@ -15,7 +17,7 @@ public class TransactionService {
         repo.save(transaction);
     }
 
-    public Iterable<Transaction> getAll(){
+    public List<Transaction> getAll(){
         return repo.findAll();
     }
 }

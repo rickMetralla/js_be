@@ -103,7 +103,20 @@ public class TransactionController {
         int indexCustomer = getIndexCustomer(tr.getCustDni(), result);
         if (indexCustomer > -1) {
             ProductOrder prod = new ProductOrder(tr.getOrder());
-            //result.get(indexCustomer).getProductOrders().add(prod); //need improvements
+            List<CustomerOrder> res = result.get(indexCustomer).getCustomerOrders();
+            for (CustomerOrder cPurch : res) {
+                if(cPurch.getPurchasedAt() == tr.getPurchasedAt()){
+                    int i = result.get(indexCustomer).getCustomerOrders().indexOf(cPurch);
+                    result.get(indexCustomer).getCustomerOrders().get(i).getProductOrders().add(prod);
+                    return;
+                }
+            }
+            List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
+                add(new ProductOrder(tr.getOrder()));
+            }};
+
+            CustomerOrder custOrder = new CustomerOrder(lpo, tr.getPurchasedAt());
+            result.get(indexCustomer).getCustomerOrders().add(custOrder);
         } else {
             List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
                 add(new ProductOrder(tr.getOrder()));
