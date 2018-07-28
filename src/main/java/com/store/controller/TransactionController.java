@@ -44,16 +44,14 @@ public class TransactionController {
         return null;
     }
 
-
-
-    @RequestMapping(value = "/abuyers", method = RequestMethod.GET)
-    public ResponseEntity<Iterable<Transaction>> getAvailableBuyers(){
-        Iterable<Transaction> transaction = service.getAll();
-
-        Iterable<Integer> availables = DrawUtil.getDniCustomers(transaction );
-        Iterable<Transaction> ucst = getAvalaible(availables);
-        return new ResponseEntity<Iterable<Transaction>>(ucst, HttpStatus.OK);
-    }
+//    @RequestMapping(value = "/abuyers", method = RequestMethod.GET)
+//    public ResponseEntity<Iterable<Transaction>> getAvailableBuyers(){
+//        Iterable<Transaction> transaction = service.getAll();
+//
+//        Iterable<Integer> availables = DrawUtil.getDniCustomers(transaction );
+//        Iterable<Transaction> ucst = getAvalaible(availables);
+//        return new ResponseEntity<Iterable<Transaction>>(ucst, HttpStatus.OK);
+//    }
 
     private void saveTransactionForCustomer(CustomerPurchase cp) {
         for (CustomerOrder po: cp.getCustomerOrders()){
@@ -64,7 +62,6 @@ public class TransactionController {
             }
         }
     }
-
 
 //    @RequestMapping(value = "/buyers", method = RequestMethod.GET)
 //    public ResponseEntity<Iterable<Customer>> getAllBuyers(){
@@ -105,7 +102,7 @@ public class TransactionController {
             ProductOrder prod = new ProductOrder(tr.getOrder());
             List<CustomerOrder> res = result.get(indexCustomer).getCustomerOrders();
             for (CustomerOrder cPurch : res) {
-                if(cPurch.getPurchasedAt() == tr.getPurchasedAt()){
+                if(cPurch.getPurchasedAt().compareTo(tr.getPurchasedAt()) == 0){
                     int i = result.get(indexCustomer).getCustomerOrders().indexOf(cPurch);
                     result.get(indexCustomer).getCustomerOrders().get(i).getProductOrders().add(prod);
                     return;
@@ -141,19 +138,19 @@ public class TransactionController {
         return -1;
     }
 
-    private void updateLuckyCustomer(Customer luckyCustomer) {
-        //luckyCustomer.setWinner(true);
-        customerService.update(luckyCustomer);
-    }
+//    private void updateLuckyCustomer(Customer luckyCustomer) {
+//        //luckyCustomer.setWinner(true);
+//        customerService.update(luckyCustomer);
+//    }
 
-    private Iterable<Transaction> getAvalaible(Iterable<Integer> dni){
-        List<Transaction> res = new ArrayList<>();
-//        for (int i:dni) {
-//            Customer cu = customerService.findByDni(i);
-////            if (!cu.isWinner()){
-////                res.add(cu);
-////            }
-//        }
-        return res;
-    }
+//    private Iterable<Transaction> getAvalaible(Iterable<Integer> dni){
+//        List<Transaction> res = new ArrayList<>();
+////        for (int i:dni) {
+////            Customer cu = customerService.findByDni(i);
+//////            if (!cu.isWinner()){
+//////                res.add(cu);
+//////            }
+////        }
+//        return res;
+//    }
 }

@@ -38,7 +38,7 @@ public class Product {
     private int amount;
 
     @Column(name = "date_created")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
     private Date dateCreated;
 
     public String getModel() {
