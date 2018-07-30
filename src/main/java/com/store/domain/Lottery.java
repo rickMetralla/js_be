@@ -1,11 +1,13 @@
 package com.store.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "lottery")
 public class Lottery {
 
@@ -36,6 +38,10 @@ public class Lottery {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
     private
     Date endAt;
+
+    @Column(name = "active")
+    private
+    boolean active;
 
     public int getId() {
         return id;
@@ -71,5 +77,13 @@ public class Lottery {
 
     public void setEndAt(Date endAt) {
         this.endAt = endAt;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

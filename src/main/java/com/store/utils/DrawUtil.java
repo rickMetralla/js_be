@@ -3,6 +3,11 @@ package com.store.utils;
 import com.store.domain.Transaction;
 import com.store.domain.Customer;
 import com.store.domain.Product;
+import com.store.dto.CustomerOrder;
+import com.store.dto.CustomerPurchase;
+import com.store.dto.ProductOrder;
+import com.store.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,35 +16,69 @@ import java.util.Set;
 
 public class DrawUtil {
 
-    public static Iterable<Integer> getDniCustomers(Iterable<Transaction> buyers) {
-        Set<Integer> customer_dni = new HashSet<Integer>();
-        for(Transaction buyer:buyers)
-            customer_dni.add(buyer.getCustDni());
-        return customer_dni;
+//    @Autowired
+//    ProductService productService;
+
+//    public static Iterable<Integer> getDniCustomers(Iterable<Transaction> buyers) {
+//        Set<Integer> customer_dni = new HashSet<Integer>();
+//        for(Transaction buyer:buyers)
+//            customer_dni.add(buyer.getCustDni());
+//        return customer_dni;
+//    }
+
+    public static int getAwards(Iterable<CustomerPurchase> customers, Iterable<Product> products) {
+        int luckyDni;
+        List<Integer> dnisAmphora = new ArrayList<>();
+        for (CustomerPurchase customer:customers){
+            setChancesForPrize(customer, dnisAmphora, products);
+        }
+        return makeDrawPrize(dnisAmphora);
     }
 
-//    public static int getAwards(Iterable<Customer> customers) {
-//        int luckyDni;
-//        List<Integer> dnisAmphora = new ArrayList<>();
-//        for (Customer customer:customers){
-//            setChancesForPrize(customer, dnisAmphora);
-//        }
-//        return makeDrawPrize(dnisAmphora);
-//    }
+    private static void setChancesForPrize(CustomerPurchase customer, List<Integer> dnisAmphora, Iterable<Product> listProducts) {
+        List<Product> products = getProducts(customer, listProducts);
+        if (!products.isEmpty()){
+            for (Product product:products){
+                int chances = getChanceByModel(product.getModel());
+                setChancesToWin(customer, dnisAmphora, chances);
+            }
+        }
+    }
 
-//    private static void setChancesForPrize(Customer customer, List<Integer> dnisAmphora) {
-//        List<Product> products = customer.getProducts();
-//        if (!products.isEmpty()){
-//            for (Product product:products){
-//                int chances = getChanceByModel(product.getModel());
-//                setChancesToWin(customer, dnisAmphora, chances);
-//            }
-//        }
-//    }
+    private static List<Product> getProducts(CustomerPurchase customer, Iterable<Product> listProducts) {
+        List<CustomerOrder> custOrders = customer.getCustomerOrders();
+        List<Product> productsResults = new ArrayList<>();
+        for (CustomerOrder cOrder : custOrders) {
+            List<ProductOrder> productOrders = cOrder.getProductOrders();
+            loadProducts(productsResults, productOrders, listProducts);
+        }
+        return productsResults;
+    }
 
-    private static void setChancesToWin(Customer customer, List<Integer> dnisAmphora, int chances) {
+    private static void loadProducts(List<Product> products, List<ProductOrder> productOrders, Iterable<Product> listProducts) {
+        ProductService ps = new ProductService();
+        for (ProductOrder pOrder : productOrders) {
+            Product product = findProduct(pOrder.getProdId(), listProducts);
+            for (int i = 0; i < pOrder.getAmount(); i++){
+                if(product != null){
+                    products.add(product);
+                }
+            }
+        }
+    }
+
+    private static Product findProduct(int prodId, Iterable<Product> listProducts) {
+        for (Product p : listProducts) {
+            if (p.getId() == prodId) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    private static void setChancesToWin(CustomerPurchase customer, List<Integer> dnisAmphora, int chances) {
         for (;0 < chances;chances--) {
-            dnisAmphora.add(customer.getDni());
+            dnisAmphora.add(customer.getCustDni());
         }
     }
 

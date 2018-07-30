@@ -2,9 +2,13 @@ package com.store.domain;
 
 import javax.persistence.*;
 
-@Embeddable
+@Entity
 @Table(name = "winners")
 public class Winners {
+
+    @Id
+    private
+    int id;
 
     @Column(name = "cust_dni")
     private int custDni;
@@ -26,5 +30,9 @@ public class Winners {
 
     public void setLotteryId(int lotteryId) {
         this.lotteryId = lotteryId;
+    }
+
+    public int getId() {
+        return id;
     }
 }
