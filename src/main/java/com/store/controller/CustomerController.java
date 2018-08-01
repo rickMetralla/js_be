@@ -13,7 +13,7 @@ public class CustomerController {
     @Autowired
     CustomerService service;
 
-    @RequestMapping(value = "/customer/{dni}", method = RequestMethod.GET)
+    @RequestMapping(value = "/customers/{dni}", method = RequestMethod.GET)
     public ResponseEntity<Customer> getCustomerById(@PathVariable Integer dni){
         Customer one = service.findByDni(dni);
         if (one == null){
@@ -29,13 +29,13 @@ public class CustomerController {
         return new ResponseEntity<Iterable<Customer>>(service.getAll(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/customer/", method = RequestMethod.POST)
+    @RequestMapping(value = "/customers", method = RequestMethod.POST)
     public ResponseEntity<String> createCustomer(@RequestBody Customer customer){
         service.create(customer);
         return new ResponseEntity<String>("Customer created successfully", HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/customer/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/customers", method = RequestMethod.PUT)
     public ResponseEntity<String> updateCustomer(@RequestBody Customer updatedCustomer){
         if(service.findByDni(updatedCustomer.getDni()) == null){
             return new ResponseEntity<String>("Customer not found", HttpStatus.NOT_FOUND);
@@ -46,7 +46,7 @@ public class CustomerController {
         }
     }
 
-    @RequestMapping(value = "/customer/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/customers/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteCustomer(@PathVariable Integer id){
         if(service.findByDni(id) == null){
             return new ResponseEntity<String>("Customer not found", HttpStatus.NOT_FOUND);

@@ -14,7 +14,7 @@ public class ProductController {
     @Autowired
     ProductService service;
 
-    @RequestMapping(value = "/product/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
     public ResponseEntity<Product> getProductById(@PathVariable Integer id){
         Product oneProd = service.findById(id);
         if (oneProd == null){
@@ -30,13 +30,13 @@ public class ProductController {
         return new ResponseEntity<Iterable<Product>>(service.getAll(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/product", method = RequestMethod.POST)
+    @RequestMapping(value = "/products", method = RequestMethod.POST)
     public ResponseEntity<String> createProduct(@RequestBody Product product){
         service.create(product);
         return new ResponseEntity<String>("Product created successfully", HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/product", method = RequestMethod.PUT)
+    @RequestMapping(value = "/products", method = RequestMethod.PUT)
     public ResponseEntity<String> updateProduct(@RequestBody Product updatedProduct){
         if(service.findById(updatedProduct.getId()) == null){
             return new ResponseEntity<String>("Product not found", HttpStatus.NOT_FOUND);
@@ -47,7 +47,7 @@ public class ProductController {
         }
     }
 
-    @RequestMapping(value = "/product/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/products/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteProduct(@PathVariable Integer id){
         if(service.findById(id) == null){
             return new ResponseEntity<String>("Product not found", HttpStatus.NOT_FOUND);

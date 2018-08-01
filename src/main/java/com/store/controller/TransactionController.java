@@ -2,13 +2,11 @@ package com.store.controller;
 
 import com.store.domain.Order;
 import com.store.domain.Transaction;
-import com.store.domain.Customer;
 import com.store.dto.CustomerOrder;
 import com.store.dto.CustomerPurchase;
 import com.store.dto.ProductOrder;
 import com.store.service.TransactionService;
 import com.store.service.CustomerService;
-import com.store.utils.DrawUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,32 +24,23 @@ public class TransactionController {
     @Autowired
     CustomerService customerService;
 
-    @RequestMapping(value = "/purchase", method = RequestMethod.POST)
+    @RequestMapping(value = "/purchases", method = RequestMethod.POST)
     public ResponseEntity<String> createPurchase(@RequestBody CustomerPurchase customerPurchase){
         saveTransactionForCustomer(customerPurchase);
         return new ResponseEntity<String>("successfully created", HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/purchasers", method = RequestMethod.GET)
+    @RequestMapping(value = "/purchases", method = RequestMethod.GET)
     public ResponseEntity<Iterable<CustomerPurchase>> getPurchasers(){
         Iterable<Transaction> transaction = service.getAll();
         Iterable<CustomerPurchase> normalizedTransaction = normalizeTransaction(transaction);
         return new ResponseEntity<Iterable<CustomerPurchase>>(normalizedTransaction , HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/purchase/{dni}", method = RequestMethod.GET)
+    @RequestMapping(value = "/purchases/{dni}", method = RequestMethod.GET)
     public ResponseEntity<Transaction> getPurchase(){
         return null;
     }
-
-//    @RequestMapping(value = "/abuyers", method = RequestMethod.GET)
-//    public ResponseEntity<Iterable<Transaction>> getAvailableBuyers(){
-//        Iterable<Transaction> transaction = service.getAll();
-//
-//        Iterable<Integer> availables = DrawUtil.getDniCustomers(transaction );
-//        Iterable<Transaction> ucst = getAvalaible(availables);
-//        return new ResponseEntity<Iterable<Transaction>>(ucst, HttpStatus.OK);
-//    }
 
     private void saveTransactionForCustomer(CustomerPurchase cp) {
         for (CustomerOrder po: cp.getCustomerOrders()){
@@ -62,31 +51,6 @@ public class TransactionController {
             }
         }
     }
-
-//    @RequestMapping(value = "/buyers", method = RequestMethod.GET)
-//    public ResponseEntity<Iterable<Customer>> getAllBuyers(){
-//        Iterable<Transaction> transaction = service.getAll();
-//        Iterable<Integer> dni = DrawUtil.getDniCustomers(transaction);
-//
-//        List<Customer> res = new ArrayList<>();
-//        for (int i:dni) {
-//            res.add(customerService.findByDni(i));
-//        }
-//        return new ResponseEntity<Iterable<Customer>>(res, HttpStatus.OK);
-//    }
-
-//    @RequestMapping(value = "/prize", method = RequestMethod.GET)
-//    public ResponseEntity<Customer> makeDraw(){
-//
-//        Iterable<Transaction> customers = service.getAll();
-//        Iterable<Integer> availables = DrawUtil.getDniCustomers(customers);
-//        Iterable<Customer> ucst = getAvalaible(availables);
-//
-//        int awardedDni = DrawUtil.getAwards(ucst);
-//        Customer luckyCustomer = customerService.findByDni(awardedDni);
-//        updateLuckyCustomer(luckyCustomer);
-//        return new ResponseEntity<Customer>(luckyCustomer, HttpStatus.OK);
-//    }
 
     private Iterable<CustomerPurchase> normalizeTransaction(Iterable<Transaction> transactions){
         List<CustomerPurchase> result = new ArrayList<>();

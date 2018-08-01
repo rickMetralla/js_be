@@ -19,7 +19,7 @@ public class WinnerController {
         return new ResponseEntity<Iterable<Winners>>(winners, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/winner", method = RequestMethod.POST)
+    @RequestMapping(value = "/winners", method = RequestMethod.POST)
     public ResponseEntity<String> createPurchase(@RequestBody Winners winner){
         winService.create(winner);
         return new ResponseEntity<String>("successfully created", HttpStatus.CREATED);

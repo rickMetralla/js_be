@@ -1,16 +1,11 @@
 package com.store.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Calendar;
-import java.util.Set;
 
 @Entity
 //@EnableJpaAuditing
@@ -34,8 +29,8 @@ public class Product {
     @Column(name = "model")
     private String model;
 
-    @Column(name = "amount")
-    private int amount;
+    @Column(name = "stock")
+    private int stock;
 
     @Column(name = "date_created")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
@@ -71,11 +66,11 @@ public class Product {
         this.dateCreated = dateCreated;
     }
 
-    public int getAmount() {
-        return amount;
+    public int getStock() {
+        return stock;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 }
