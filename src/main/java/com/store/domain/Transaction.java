@@ -74,14 +74,6 @@ public class Transaction implements Serializable {
         this.custDni = custDni;
     }
 
-//    public int getProdId() {
-//        return prodId;
-//    }
-//
-//    public void setProdId(int prodId) {
-//        this.prodId = prodId;
-//    }
-
     public Date getPurchasedAt() {
         return purchasedAt;
     }
@@ -89,14 +81,6 @@ public class Transaction implements Serializable {
     public void setPurchasedAt(Date purchasedAt) {
         this.purchasedAt = purchasedAt;
     }
-
-//    public List<Order> getOrders() {
-//        return orders;
-//    }
-//
-//    public void setOrders(List<Order> orders) {
-//        this.orders = orders;
-//    }
 
     public Order getOrder() {
         return order;
@@ -106,13 +90,9 @@ public class Transaction implements Serializable {
         this.order = order;
     }
 
-//    public List<Product> getProducts() {
-//        return products;
-//    }
-//
-//    public void setProducts(List<Product> products) {
-//        this.products = products;
-//    }
-
-
+    @Override
+    public String toString(){
+        return "Customer dni: " + this.custDni + ", Order: " +
+                this.order.toString() + ", purchased at: " + this.purchasedAt.toString();
+    }
 }

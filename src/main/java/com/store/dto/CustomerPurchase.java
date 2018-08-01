@@ -42,20 +42,9 @@ public class CustomerPurchase {
         this.customerOrders = customerOrders;
     }
 
-//    public List<ProductOrder> getProductOrders() {
-//        return productOrders;
-//    }
-//
-//    public void setProductOrders(List<ProductOrder> productOrders) {
-//        this.productOrders = productOrders;
-//    }
-//
-//    public Date getPurchasedAt() {
-//        return purchasedAt;
-//    }
-//
-//    public void setPurchasedAt(Date purchasedAt) {
-//        this.purchasedAt = purchasedAt;
-//    }
+    @Override
+    public String toString(){
+        return "Customer dni: " + custDni + " Number of Orders: " + customerOrders.size();
+    }
 }
 

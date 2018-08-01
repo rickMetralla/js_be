@@ -36,4 +36,9 @@ public class Order implements Serializable {
         this.prodId = id;
         this.amount = amount;
     }
+
+    @Override
+    public String toString(){
+        return "Product id: " + this.prodId + ", amount: " + amount;
+    }
 }

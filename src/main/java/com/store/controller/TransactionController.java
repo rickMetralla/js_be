@@ -1,5 +1,6 @@
 package com.store.controller;
 
+import com.store.LoggerWrapper;
 import com.store.domain.Order;
 import com.store.domain.Product;
 import com.store.domain.Transaction;
@@ -16,10 +17,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:9000")
 public class TransactionController {
+
     @Autowired
     TransactionService service;
 
@@ -28,17 +32,21 @@ public class TransactionController {
 
     @Autowired
     CustomerService customerService;
+    Logger LOGGER = LoggerWrapper.getInstance().logger;
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
     public ResponseEntity<String> createPurchase(@RequestBody CustomerPurchase customerPurchase){
+        LOGGER.log(Level.INFO, "Applying purchase request for: {0}", customerPurchase.toString());
         try {
             validatePurchase(customerPurchase);
             saveTransactionForCustomer(customerPurchase);
         }
         catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Not possible to perform purchase: {0}", e.getMessage());
             e.printStackTrace();
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+        LOGGER.log(Level.INFO, "Purchase transaction for: {0} Completed", customerPurchase.toString());
         return new ResponseEntity<String>("Successfully created", HttpStatus.CREATED);
     }
 
@@ -55,7 +63,7 @@ public class TransactionController {
     }
 
     private void validatePurchase(CustomerPurchase customerPurchase) throws Exception {
-        int dni = customerPurchase.getCustDni();
+        int dni = customerPurchase.getCustDni(); //maybe validate if dni exist
         List<CustomerOrder> customerOrders = customerPurchase.getCustomerOrders();
         for (CustomerOrder custOrder : customerOrders) {
             List<ProductOrder> productOrders = custOrder.getProductOrders();
@@ -69,8 +77,12 @@ public class TransactionController {
             int amount = pOrder.getAmount();
             Product product = prodService.findById(id);
             if(product.getStock() < amount){
+                String msg = String.format("Product %s amount request out of stock: Amount requested: %d; Stock: %d",
+                        product.getName(), amount, product.getStock());
+                LOGGER.log(Level.SEVERE, msg);
                 throw new Exception("Amount is bigger than stock");
             }
+            LOGGER.log(Level.INFO, "Stock validation for product {0} OK", product.getName());
         }
     }
 
@@ -80,6 +92,7 @@ public class TransactionController {
                 Order order = new Order(pOrder.getProdId(), pOrder.getAmount());
                 Transaction transaction = new Transaction(cp.getCustDni(), order, po.getPurchasedAt());
                 service.createBuy(transaction);
+                LOGGER.log(Level.INFO, "Transaction: {0} saved successfully", transaction.toString());
             }
         }
     }

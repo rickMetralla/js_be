@@ -1,5 +1,6 @@
 package com.store.controller;
 
+import com.store.LoggerWrapper;
 import com.store.domain.Customer;
 import com.store.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,11 +8,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.logging.Logger;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:9000")
 public class CustomerController {
+
     @Autowired
     CustomerService service;
+    Logger LOGGER = LoggerWrapper.getInstance().logger;
 
     @RequestMapping(value = "/customers/{dni}", method = RequestMethod.GET)
     public ResponseEntity<Customer> getCustomerById(@PathVariable Integer dni){

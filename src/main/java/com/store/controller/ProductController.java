@@ -15,10 +15,9 @@ import java.util.logging.Logger;
 @CrossOrigin(origins = "http://localhost:9000")
 public class ProductController {
 
-    Logger LOGGER = LoggerWrapper.getInstance().logger;
-
     @Autowired
     ProductService service;
+    Logger LOGGER = LoggerWrapper.getInstance().logger;
 
     @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
     public ResponseEntity<Product> getProductById(@PathVariable Integer id){

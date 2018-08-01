@@ -8,8 +8,8 @@ import java.util.Date;
 
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Table(name = "lottery")
-public class Lottery {
+@Table(name = "promo")
+public class Promo {
 
     @Id
     @SequenceGenerator(name="lottery_id_seq",
