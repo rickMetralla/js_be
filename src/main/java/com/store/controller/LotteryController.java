@@ -34,7 +34,7 @@ public class LotteryController {
     @Autowired
     ProductService prodService;
 
-    @RequestMapping(value = "/lot/{idLot}", method = RequestMethod.GET)
+    @RequestMapping(value = "/lots/{idLot}", method = RequestMethod.GET)
     public ResponseEntity<Lottery> getLottery(@PathVariable Integer idLot){
         Lottery lot = lotService.findById(idLot);
         if(lot == null)
@@ -47,7 +47,7 @@ public class LotteryController {
         return new ResponseEntity<Iterable<Lottery>>(lotService.findAll(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/lot", method = RequestMethod.POST)
+    @RequestMapping(value = "/lots", method = RequestMethod.POST)
     public ResponseEntity<String> createLottery(@RequestBody Lottery lot){
         if(verifyDate(lot)){
             lotService.create(lot);
@@ -57,13 +57,13 @@ public class LotteryController {
         }
     }
 
-    @RequestMapping(value = "/lot", method = RequestMethod.PUT)
+    @RequestMapping(value = "/lots", method = RequestMethod.PUT)
     public ResponseEntity<String> updateLottery(@RequestBody Lottery lot){
         lotService.update(lot);
         return new ResponseEntity<String>("Lottery successfully updated", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/lot/{lotId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/lots/{lotId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> createLottery(@RequestBody int lotId){
         lotService.delete(lotId);
         return new ResponseEntity<String>("Lottery successfully deleted", HttpStatus.OK);
@@ -72,8 +72,9 @@ public class LotteryController {
     @RequestMapping(value = "/activeLot", method = RequestMethod.GET)
     public ResponseEntity<Lottery> getActiveLottery(){
         Lottery activeLot = findActiveLotery();
-        if(activeLot == null)
-            return new ResponseEntity<Lottery>(activeLot, HttpStatus.NOT_FOUND);
+        if(activeLot == null){
+            return new ResponseEntity<Lottery>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<Lottery>(activeLot, HttpStatus.OK);
     }
 

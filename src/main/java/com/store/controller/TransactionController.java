@@ -1,10 +1,12 @@
 package com.store.controller;
 
 import com.store.domain.Order;
+import com.store.domain.Product;
 import com.store.domain.Transaction;
 import com.store.dto.CustomerOrder;
 import com.store.dto.CustomerPurchase;
 import com.store.dto.ProductOrder;
+import com.store.service.ProductService;
 import com.store.service.TransactionService;
 import com.store.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +24,22 @@ public class TransactionController {
     TransactionService service;
 
     @Autowired
+    ProductService prodService;
+
+    @Autowired
     CustomerService customerService;
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
     public ResponseEntity<String> createPurchase(@RequestBody CustomerPurchase customerPurchase){
-        saveTransactionForCustomer(customerPurchase);
-        return new ResponseEntity<String>("successfully created", HttpStatus.CREATED);
+        try {
+            validatePurchase(customerPurchase);
+            saveTransactionForCustomer(customerPurchase);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<String>("Successfully created", HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/purchases", method = RequestMethod.GET)
@@ -40,6 +52,26 @@ public class TransactionController {
     @RequestMapping(value = "/purchases/{dni}", method = RequestMethod.GET)
     public ResponseEntity<Transaction> getPurchase(){
         return null;
+    }
+
+    private void validatePurchase(CustomerPurchase customerPurchase) throws Exception {
+        int dni = customerPurchase.getCustDni();
+        List<CustomerOrder> customerOrders = customerPurchase.getCustomerOrders();
+        for (CustomerOrder custOrder : customerOrders) {
+            List<ProductOrder> productOrders = custOrder.getProductOrders();
+            validateProductOrders(productOrders);
+        }
+    }
+
+    private void validateProductOrders(List<ProductOrder> productOrders) throws Exception {
+        for (ProductOrder pOrder : productOrders) {
+            int id = pOrder.getProdId();
+            int amount = pOrder.getAmount();
+            Product product = prodService.findById(id);
+            if(product.getStock() < amount){
+                throw new Exception("Amount is bigger than stock");
+            }
+        }
     }
 
     private void saveTransactionForCustomer(CustomerPurchase cp) {
