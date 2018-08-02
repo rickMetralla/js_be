@@ -91,7 +91,7 @@ public class PromoController {
     private Promo findActiveLotery() {
         Iterable<Promo> lots = promoService.findAll();
         for (Promo lot : lots) {
-            if(lot.isActive()){
+            if(lot.getStatus() == 1){
                 return lot;
             }
         }

@@ -30,18 +30,18 @@ public class Promo {
     String description;
 
     @Column(name = "start_at")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     private
     Date startAt;
 
     @Column(name = "end_at")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     private
     Date endAt;
 
-    @Column(name = "active")
+    @Column(name = "status")
     private
-    boolean active;
+    int status;
 
     public int getId() {
         return id;
@@ -79,11 +79,11 @@ public class Promo {
         this.endAt = endAt;
     }
 
-    public boolean isActive() {
-        return active;
+    public int getStatus() {
+        return status;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
