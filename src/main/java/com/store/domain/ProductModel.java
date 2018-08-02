@@ -18,6 +18,9 @@ public class ProductModel {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "chance")
+    private int chance;
+
     public String getName() {
         return name;
     }
@@ -28,5 +31,13 @@ public class ProductModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getChance() {
+        return chance;
+    }
+
+    public void setChance(int chance) {
+        this.chance = chance;
     }
 }

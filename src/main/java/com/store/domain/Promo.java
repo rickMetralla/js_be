@@ -12,11 +12,11 @@ import java.util.Date;
 public class Promo {
 
     @Id
-    @SequenceGenerator(name="lottery_id_seq",
-            sequenceName="lottery_id_seq",
+    @SequenceGenerator(name="promo_id_seq",
+            sequenceName="promo_id_seq",
             allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator="lottery_id_seq")
+            generator="promo_id_seq")
     @Column(name = "id")
     private
     int id;

@@ -9,21 +9,14 @@ public class CustomerPurchase {
     @JsonProperty
     private int custDni;
 
-//    @JsonProperty
-//    private List<ProductOrder>  productOrders;
-//
-//    @JsonProperty
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
-//    private Date purchasedAt;
-
-    private List<CustomerOrder> customerOrders;
+    private List<Invoice> invoices;
 
     public CustomerPurchase(){
     }
 
-    public CustomerPurchase(int custDni, List<CustomerOrder> customerOrders){
+    public CustomerPurchase(int custDni, List<Invoice> invoices){
         this.custDni = custDni;
-        this.setCustomerOrders(customerOrders);
+        this.setInvoices(invoices);
     }
 
     public int getCustDni() {
@@ -34,17 +27,17 @@ public class CustomerPurchase {
         this.custDni = custDni;
     }
 
-    public List<CustomerOrder> getCustomerOrders() {
-        return customerOrders;
+    public List<Invoice> getInvoices() {
+        return invoices;
     }
 
-    public void setCustomerOrders(List<CustomerOrder> customerOrders) {
-        this.customerOrders = customerOrders;
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
     }
 
     @Override
     public String toString(){
-        return "Customer dni: " + custDni + " Number of Orders: " + customerOrders.size();
+        return "Customer dni: " + custDni + " Number of invoices: " + invoices.size();
     }
 }
 

@@ -4,18 +4,18 @@ import com.store.LoggerWrapper;
 import com.store.domain.Order;
 import com.store.domain.Product;
 import com.store.domain.Transaction;
-import com.store.dto.CustomerOrder;
+import com.store.dto.Invoice;
 import com.store.dto.CustomerPurchase;
 import com.store.dto.ProductOrder;
 import com.store.service.ProductService;
 import com.store.service.TransactionService;
 import com.store.service.CustomerService;
+import com.store.utils.TransactionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +53,7 @@ public class TransactionController {
     @RequestMapping(value = "/purchases", method = RequestMethod.GET)
     public ResponseEntity<Iterable<CustomerPurchase>> getPurchasers(){
         Iterable<Transaction> transaction = service.getAll();
-        Iterable<CustomerPurchase> normalizedTransaction = normalizeTransaction(transaction);
+        Iterable<CustomerPurchase> normalizedTransaction = TransactionUtil.normalizeTransaction(transaction);
         return new ResponseEntity<Iterable<CustomerPurchase>>(normalizedTransaction , HttpStatus.OK);
     }
 
@@ -64,8 +64,8 @@ public class TransactionController {
 
     private void validatePurchase(CustomerPurchase customerPurchase) throws Exception {
         int dni = customerPurchase.getCustDni(); //maybe validate if dni exist
-        List<CustomerOrder> customerOrders = customerPurchase.getCustomerOrders();
-        for (CustomerOrder custOrder : customerOrders) {
+        List<Invoice> invoices = customerPurchase.getInvoices();
+        for (Invoice custOrder : invoices) {
             List<ProductOrder> productOrders = custOrder.getProductOrders();
             validateProductOrders(productOrders);
         }
@@ -87,7 +87,7 @@ public class TransactionController {
     }
 
     private void saveTransactionForCustomer(CustomerPurchase cp) {
-        for (CustomerOrder po: cp.getCustomerOrders()){
+        for (Invoice po: cp.getInvoices()){
             for (ProductOrder pOrder: po.getProductOrders()) {
                 Order order = new Order(pOrder.getProdId(), pOrder.getAmount());
                 Transaction transaction = new Transaction(cp.getCustDni(), order, po.getPurchasedAt());
@@ -97,55 +97,55 @@ public class TransactionController {
         }
     }
 
-    private Iterable<CustomerPurchase> normalizeTransaction(Iterable<Transaction> transactions){
-        List<CustomerPurchase> result = new ArrayList<>();
-        for (Transaction tr : transactions){
-           loadTransaction(tr, result);
-        }
-        return result;
-    }
-
-    private void loadTransaction(Transaction tr, List<CustomerPurchase> result) {
-        int indexCustomer = getIndexCustomer(tr.getCustDni(), result);
-        if (indexCustomer > -1) {
-            ProductOrder prod = new ProductOrder(tr.getOrder());
-            List<CustomerOrder> res = result.get(indexCustomer).getCustomerOrders();
-            for (CustomerOrder cPurch : res) {
-                if(cPurch.getPurchasedAt().compareTo(tr.getPurchasedAt()) == 0){
-                    int i = result.get(indexCustomer).getCustomerOrders().indexOf(cPurch);
-                    result.get(indexCustomer).getCustomerOrders().get(i).getProductOrders().add(prod);
-                    return;
-                }
-            }
-            List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
-                add(new ProductOrder(tr.getOrder()));
-            }};
-
-            CustomerOrder custOrder = new CustomerOrder(lpo, tr.getPurchasedAt());
-            result.get(indexCustomer).getCustomerOrders().add(custOrder);
-        } else {
-            List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
-                add(new ProductOrder(tr.getOrder()));
-            }};
-
-            List<CustomerOrder> listCustomerOrders = new ArrayList<CustomerOrder>() {{
-                add(new CustomerOrder(lpo, tr.getPurchasedAt()));
-            }};
-            CustomerPurchase cp = new CustomerPurchase(tr.getCustDni(), listCustomerOrders);
-            result.add(cp);
-        }
-    }
-
-    private int getIndexCustomer(int custDni, List<CustomerPurchase> result) {
-        if(!result.isEmpty()){
-            for (CustomerPurchase cp : result) {
-                if (cp.getCustDni() == custDni){
-                    return result.indexOf(cp);
-                }
-            }
-        }
-        return -1;
-    }
+//    private Iterable<CustomerPurchase> normalizeTransaction(Iterable<Transaction> transactions){
+//        List<CustomerPurchase> result = new ArrayList<>();
+//        for (Transaction tr : transactions){
+//           loadTransaction(tr, result);
+//        }
+//        return result;
+//    }
+//
+//    private void loadTransaction(Transaction tr, List<CustomerPurchase> result) {
+//        int indexCustomer = getIndexCustomer(tr.getCustDni(), result);
+//        if (indexCustomer > -1) {
+//            ProductOrder prod = new ProductOrder(tr.getOrder());
+//            List<Invoice> res = result.get(indexCustomer).getInvoices();
+//            for (Invoice cPurch : res) {
+//                if(cPurch.getPurchasedAt().compareTo(tr.getPurchasedAt()) == 0){
+//                    int i = result.get(indexCustomer).getInvoices().indexOf(cPurch);
+//                    result.get(indexCustomer).getInvoices().get(i).getProductOrders().add(prod);
+//                    return;
+//                }
+//            }
+//            List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
+//                add(new ProductOrder(tr.getOrder()));
+//            }};
+//
+//            Invoice custOrder = new Invoice(lpo, tr.getPurchasedAt());
+//            result.get(indexCustomer).getInvoices().add(custOrder);
+//        } else {
+//            List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
+//                add(new ProductOrder(tr.getOrder()));
+//            }};
+//
+//            List<Invoice> listCustomerOrders = new ArrayList<Invoice>() {{
+//                add(new Invoice(lpo, tr.getPurchasedAt()));
+//            }};
+//            CustomerPurchase cp = new CustomerPurchase(tr.getCustDni(), listCustomerOrders);
+//            result.add(cp);
+//        }
+//    }
+//
+//    private int getIndexCustomer(int custDni, List<CustomerPurchase> result) {
+//        if(!result.isEmpty()){
+//            for (CustomerPurchase cp : result) {
+//                if (cp.getCustDni() == custDni){
+//                    return result.indexOf(cp);
+//                }
+//            }
+//        }
+//        return -1;
+//    }
 
 //    private void updateLuckyCustomer(Customer luckyCustomer) {
 //        //luckyCustomer.setWinner(true);

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
 import java.util.List;
 
-public class CustomerOrder {
+public class Invoice {
     @JsonProperty
     private List<ProductOrder> productOrders;
 
@@ -14,10 +14,10 @@ public class CustomerOrder {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
     private Date purchasedAt;
 
-    public CustomerOrder(){
+    public Invoice(){
     }
 
-    public CustomerOrder(List<ProductOrder> productOrders, Date purchasedAt){
+    public Invoice(List<ProductOrder> productOrders, Date purchasedAt){
         this.productOrders = productOrders;
         this.purchasedAt = purchasedAt;
     }
