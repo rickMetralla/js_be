@@ -26,7 +26,16 @@ public class Customer {
     @Column(name = "email")
     private String email;
 
-//    private List<Product> products;
+    public Customer(){
+    }
+
+    public Customer(String name, int dni, String address, int phone, String email){
+        this.name = name;
+        this.dni = dni;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+    }
 
     public String getName() {
         return name;
@@ -67,13 +76,4 @@ public class Customer {
     public void setEmail(String email) {
         this.email = email;
     }
-
-//    public List<Product> getProducts() {
-//        return products;
-//    }
-//
-//    public void setProducts(List<Product> products) {
-//        this.products = products;
-//    }
-
 }
