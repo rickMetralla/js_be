@@ -13,10 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
@@ -65,9 +67,16 @@ public class PromoController {
 
     @RequestMapping(value = "/promos/{promoId}", method = RequestMethod.GET)
     public ResponseEntity<Promo> getPromo(@PathVariable Integer promoId){
+        LOGGER.log(Level.INFO, "GET request for promotion with id {0}", promoId);
         Promo promo = promoService.findById(promoId);
-        if(promo == null)
+        try{
+            if(promo.getSeason() == null)
+                return new ResponseEntity<Promo>(HttpStatus.NOT_FOUND);
+        } catch (EntityNotFoundException e){
+            LOGGER.log(Level.INFO, "Promotion with id {0} not found", promoId);
             return new ResponseEntity<Promo>(HttpStatus.NOT_FOUND);
+        }
+        LOGGER.log(Level.INFO, "Promotion found and retrieved with id {0}", promoId);
         return new ResponseEntity<Promo>(promo, HttpStatus.OK);
     }
 
@@ -89,34 +98,42 @@ public class PromoController {
 
     @RequestMapping(value = "/promos", method = RequestMethod.PUT)
     public ResponseEntity<String> updatePromo(@RequestBody Promo promo){
-        promoService.update(promo);
+        try{
+            promoService.update(promo);
+        }catch (PersistenceException e){
+            return new ResponseEntity<String>(HttpStatus.METHOD_NOT_ALLOWED);
+        }
         return new ResponseEntity<String>("Promo successfully updated", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/promos/{promoId}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> createPromo(@RequestBody Integer promoId){
+    public ResponseEntity<String> deletePromoById(@RequestBody Integer promoId){
         promoService.delete(promoId);
-        return new ResponseEntity<String>("Promo successfully deleted", HttpStatus.OK);
+        return new ResponseEntity<String>("Promo successfully deleted", HttpStatus.NO_CONTENT);
     }
 
 
     @RequestMapping(value = "/promos/{idPromo}/activate", method = RequestMethod.PUT)
     public ResponseEntity<String> activatePromo(@PathVariable Integer idPromo){
         Promo promo = promoService.findById(idPromo);
-        if(promo == null){
+        try {
+            if(promo.getSeason() == null){
+                return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            }
+        }catch (PersistenceException e){
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
         if(promo.getStatus() == 2){
             promo.setStatus(1);
             promoService.update(promo);
+            List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
+            loadPrizeDraw(availableCustomers, promo);
+            return new ResponseEntity<String>("Activation completed", HttpStatus.OK);
         }
         else{
-            new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
+            return new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
                     HttpStatus.METHOD_NOT_ALLOWED);
         }
-        List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
-        loadPrizeDraw(availableCustomers, promo);
-        return new ResponseEntity<String>("Activation completed", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/promos/{idPromo}/complete", method = RequestMethod.PUT)
@@ -154,7 +171,11 @@ public class PromoController {
     @RequestMapping(value = "/promos/{idPromo}/customers", method = RequestMethod.GET)
     public ResponseEntity<List<CustomerPurchase>> getAvailableCustomerByPromo(@PathVariable Integer idPromo){
         Promo promo = promoService.findById(idPromo);
-        if(promo == null){
+        try{
+            if(promo.getSeason() == null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }catch (EntityNotFoundException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
@@ -163,14 +184,26 @@ public class PromoController {
 
     @RequestMapping(value = "/drawprize/{idPromo}", method = RequestMethod.POST)
     public ResponseEntity<Customer> makeDrawPrize(@PathVariable Integer idPromo){
-        Promo promo = promoService.findById(idPromo);
+        Promo promo;
+        try {
+            promo = promoService.findById(idPromo);
+            if(promo.getStatus() != 1){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            LOGGER.log(Level.INFO, "Make draw prize request for promo with ID: {0}", idPromo);
+        } catch (PersistenceException e){
+            LOGGER.log(Level.SEVERE, "Make draw prize failed for promo with ID: {0}", idPromo);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
+        LOGGER.log(Level.INFO, String.format("Available users: %d for promo: %d", idPromo, availableCustomers.size()));
 
         int luckyDni = getAwards(availableCustomers/*, allProducts*/, promo);
         List<PrizeDraw> winnerToUpdate = prizeDrawService.getAllPrizes();
         updateWinner(winnerToUpdate, luckyDni, promo);
 
         Customer customer = customerService.findByDni(luckyDni);
+        LOGGER.log(Level.SEVERE, "Winner after make draw prize: {0}", customer.toString());
         return new ResponseEntity<Customer>(customer, HttpStatus.OK);
     }
 
@@ -271,10 +304,6 @@ public class PromoController {
     }
 
     private boolean isWinner(List<PrizeDraw> prizeDraws, int custDni, int promoId) {
-//        if (dnis.indexOf(custDni) != -1){
-//            return true;
-//        }
-//        return false;
         for (PrizeDraw prizeDraw: prizeDraws) {
             if(prizeDraw.getCustDni() == custDni && prizeDraw.getPromoId() == promoId){
                 return prizeDraw.isWinner();
