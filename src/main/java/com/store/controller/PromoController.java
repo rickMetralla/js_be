@@ -79,6 +79,7 @@ public class PromoController {
     @RequestMapping(value = "/promos", method = RequestMethod.POST)
     public ResponseEntity<String> createPromo(@RequestBody Promo promo){
         if(verifyDate(promo)){
+            promo.setStatus(2);
             promoService.create(promo);
             return new ResponseEntity<String>("Promo successfully created", HttpStatus.CREATED);
         } else {
@@ -110,21 +111,44 @@ public class PromoController {
             promoService.update(promo);
         }
         else{
-            new ResponseEntity<String>("activation of promo not allowed",
+            new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
                     HttpStatus.METHOD_NOT_ALLOWED);
         }
         List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
         loadPrizeDraw(availableCustomers, promo);
-        return new ResponseEntity<String>("Update completed", HttpStatus.OK);
+        return new ResponseEntity<String>("Activation completed", HttpStatus.OK);
     }
 
-    private void loadPrizeDraw(List<CustomerPurchase> availableCustomers, Promo promo) {
-        for (CustomerPurchase customer :
-                availableCustomers) {
-            int totalCustomerChances = setChancesForPrize(customer, new ArrayList<>(), promo);
-            PrizeDraw pr = new PrizeDraw(customer.getCustDni(), promo.getId(), totalCustomerChances, false);
-            prizeDrawService.create(pr);
+    @RequestMapping(value = "/promos/{idPromo}/complete", method = RequestMethod.PUT)
+    public ResponseEntity<String> completePromo(@PathVariable Integer idPromo){
+        Promo promo = promoService.findById(idPromo);
+        if(promo == null){
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
+        if(promo.getStatus() == 1){
+            promo.setStatus(3);
+            promoService.update(promo);
+        }else{
+            return new ResponseEntity<String>("Completion of promo not allowed, active status required",
+                    HttpStatus.METHOD_NOT_ALLOWED);
+        }
+        return new ResponseEntity<String>("Completion of promo completed", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/promos/{idPromo}/inactive", method = RequestMethod.PUT)
+    public ResponseEntity<String> inactivePromo(@PathVariable Integer idPromo){
+        Promo promo = promoService.findById(idPromo);
+        if(promo == null){
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+        if(promo.getStatus() == 1){
+            promo.setStatus(2);
+            promoService.update(promo);
+        }else{
+            return new ResponseEntity<String>("Inactivation of promo not allowed, active status required",
+                    HttpStatus.METHOD_NOT_ALLOWED);
+        }
+        return new ResponseEntity<String>("Inactivation completed", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/promos/{idPromo}/customers", method = RequestMethod.GET)
@@ -137,24 +161,10 @@ public class PromoController {
         return new ResponseEntity<List<CustomerPurchase>>(availableCustomers, HttpStatus.OK);
     }
 
-
-
-//    @RequestMapping(value = "/promos/{idPromo}/customers", method = RequestMethod.GET)
-//    public ResponseEntity<Promo> getActivePromo(){
-//        Promo activePromo = findActivePromo();
-//        if(activePromo == null){
-//            return new ResponseEntity<Promo>(HttpStatus.NOT_FOUND);
-//        }
-//        return new ResponseEntity<Promo>(activePromo, HttpStatus.OK);
-//    }
-
     @RequestMapping(value = "/drawprize/{idPromo}", method = RequestMethod.POST)
     public ResponseEntity<Customer> makeDrawPrize(@PathVariable Integer idPromo){
         Promo promo = promoService.findById(idPromo);
         List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
-
-//        Iterable<Product> allProducts = prodService.getAll();
-//        int luckyDni = DrawUtil.getAwards(availableCustomers, allProducts);
 
         int luckyDni = getAwards(availableCustomers/*, allProducts*/, promo);
         List<PrizeDraw> winnerToUpdate = prizeDrawService.getAllPrizes();
@@ -162,6 +172,15 @@ public class PromoController {
 
         Customer customer = customerService.findByDni(luckyDni);
         return new ResponseEntity<Customer>(customer, HttpStatus.OK);
+    }
+
+    private void loadPrizeDraw(List<CustomerPurchase> availableCustomers, Promo promo) {
+        for (CustomerPurchase customer :
+                availableCustomers) {
+            int totalCustomerChances = setChancesForPrize(customer, new ArrayList<>(), promo);
+            PrizeDraw pr = new PrizeDraw(customer.getCustDni(), promo.getId(), totalCustomerChances, false);
+            prizeDrawService.create(pr);
+        }
     }
 
     private void updateWinner(List<PrizeDraw> winnerToUpdate, int luckyDni, Promo promo) {
@@ -245,24 +264,23 @@ public class PromoController {
         Iterable<CustomerPurchase> customers = TransactionUtil.normalizeTransaction(transactions);
         for (CustomerPurchase custPurchase : customers) {
             if(existPurchaseByDate(custPurchase.getInvoices(), start, end) &&
-                    !isWinner(prizeDraws, custPurchase.getCustDni())){
+                    !isWinner(prizeDraws, custPurchase.getCustDni(), promo.getId())){
                 availableCustomers.add(custPurchase);
             }
         }
     }
 
-    private boolean isWinner(List<PrizeDraw> prizeDraws, int custDni) {
+    private boolean isWinner(List<PrizeDraw> prizeDraws, int custDni, int promoId) {
 //        if (dnis.indexOf(custDni) != -1){
 //            return true;
 //        }
 //        return false;
         for (PrizeDraw prizeDraw: prizeDraws) {
-            if(prizeDraw.getCustDni() == custDni){
+            if(prizeDraw.getCustDni() == custDni && prizeDraw.getPromoId() == promoId){
                 return prizeDraw.isWinner();
             }
         }
         return false;
-
     }
 
     private boolean existPurchaseByDate(List<Invoice> invoices, Date start, Date end) {

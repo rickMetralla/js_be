@@ -35,6 +35,7 @@ public class CustomerControllerTest {
         int dni = 123;
         Customer customer = new Customer("rick", 123, "calle", 54466, "rick@rick.com");
         given(service.findByDni(dni)).willReturn(customer);
+
         controllerMvc.perform(get("/customers/123")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());

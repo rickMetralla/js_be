@@ -14,4 +14,9 @@ public class ProductModelService {
     public Iterable<ProductModel> getAll(){
         return repository.findAll();
     }
+
+    public int getChanceByModel(String modelName){
+        ProductModel productModel = repository.findByName(modelName);
+        return productModel.getChance();
+    }
 }
