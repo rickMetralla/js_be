@@ -39,24 +39,6 @@ public class CustomerControllerTest {
         controllerMvc.perform(get("/customers/123")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
-//                .andExpect(jsonPath("$", hasSize(1)));
-//                .andExpect(jsonPath("$.name", is(customer.getName())));
-    }
-
-    @Test
-    public void getCustomers() throws Exception {
-    }
-
-    @Test
-    public void createCustomer() throws Exception {
-    }
-
-    @Test
-    public void updateCustomer() throws Exception {
-    }
-
-    @Test
-    public void deleteCustomer() throws Exception {
     }
 
 }

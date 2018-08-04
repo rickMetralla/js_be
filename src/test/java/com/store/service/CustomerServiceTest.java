@@ -46,11 +46,4 @@ public class CustomerServiceTest {
         }
     }
 
-    @Test
-    public void createTest() throws Exception {
-    }
-
-    @Test
-    public void updateTest() throws Exception {
-    }
 }
