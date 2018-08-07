@@ -52,7 +52,7 @@ public class TransactionController {
 
     @RequestMapping(value = "/purchases", method = RequestMethod.GET)
     public ResponseEntity<Iterable<CustomerPurchase>> getPurchasers(){
-        Iterable<Transaction> transaction = service.getAllTransaction();
+        List<Transaction> transaction = service.getAllTransaction();
         Iterable<CustomerPurchase> normalizedTransaction = TransactionUtil.normalizeTransaction(transaction);
         return new ResponseEntity<Iterable<CustomerPurchase>>(normalizedTransaction , HttpStatus.OK);
     }

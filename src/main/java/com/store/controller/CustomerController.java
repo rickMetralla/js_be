@@ -21,7 +21,7 @@ public class CustomerController {
     @RequestMapping(value = "/customers/{dni}", method = RequestMethod.GET)
     public ResponseEntity<Customer> getCustomerById(@PathVariable Integer dni){
         Customer one = service.findByDni(dni);
-        if (one == null){
+        if (one.getName() == null){
             return new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);
         }
         else {

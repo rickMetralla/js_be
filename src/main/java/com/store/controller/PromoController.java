@@ -168,11 +168,11 @@ public class PromoController {
     }
 
     @RequestMapping(value = "/promos/{idPromo}/customers", method = RequestMethod.GET)
-    public ResponseEntity<List<CustomerPurchase>> getAvailableCustomerByPromo(@PathVariable Integer idPromo){
+    public ResponseEntity<List<CustomerPurchase>> getAvailableCustomerByPromoBeforeActive(@PathVariable Integer idPromo){
         Promo promo = promoService.findById(idPromo);
         try{
-            if(promo.getSeason() == null){
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if(promo.getStatus() != 2){
+                return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
             }
         }catch (EntityNotFoundException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -181,7 +181,22 @@ public class PromoController {
         return new ResponseEntity<List<CustomerPurchase>>(availableCustomers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/drawprize/{idPromo}", method = RequestMethod.POST)
+    @RequestMapping(value = "/promos/{idPromo}/active/customers", method = RequestMethod.GET)
+    public ResponseEntity<List<CustomerPurchase>> getAvailableCustomerByPromoAfterActive(@PathVariable Integer idPromo){
+        Promo promo = promoService.findById(idPromo);
+        try{
+            if(promo.getStatus() != 1){
+                return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+            }
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        List<PrizeDraw> prizeDraws = prizeDrawService.getAllByPromoId(idPromo);
+        List<CustomerPurchase> availableCustomers = loadAvailableCustomersActivePromo(prizeDraws, promo);
+        return new ResponseEntity<List<CustomerPurchase>>(availableCustomers, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{idPromo}/drawprize", method = RequestMethod.POST)
     public ResponseEntity<Customer> makeDrawPrize(@PathVariable Integer idPromo){
         Promo promo;
         try {
@@ -204,6 +219,25 @@ public class PromoController {
         Customer customer = customerService.findByDni(luckyDni);
         LOGGER.log(Level.SEVERE, "Winner after make draw prize: {0}", customer.toString());
         return new ResponseEntity<Customer>(customer, HttpStatus.OK);
+    }
+
+    private List<CustomerPurchase> loadAvailableCustomersActivePromo(List<PrizeDraw> prizeDrawList, Promo promo){
+        List<CustomerPurchase> customerPurchaseList = new ArrayList<>();
+        for (PrizeDraw prizeDraw : prizeDrawList) {
+            if(!prizeDraw.isWinner()){
+                int dni = prizeDraw.getCustDni();
+                loadPurchaseByDni(customerPurchaseList, dni, promo);
+            }
+        }
+        return customerPurchaseList;
+    }
+
+    private void loadPurchaseByDni(List<CustomerPurchase> customerPurchaseList, int dni, Promo promo) {
+        List<Transaction> transactionList = transactionService.getAllTransactionByCustDni(dni);
+        List<CustomerPurchase> customerPurchase = TransactionUtil.normalizeTransactionByDateRange(transactionList, promo.getStartAt(), promo.getEndAt());
+        if(customerPurchase.size() == 1){
+            customerPurchaseList.add(customerPurchase.get(0));
+        }
     }
 
     private void loadPrizeDraw(List<CustomerPurchase> availableCustomers, Promo promo) {

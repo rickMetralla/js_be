@@ -6,11 +6,23 @@ import com.store.dto.CustomerPurchase;
 import com.store.dto.ProductOrder;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TransactionUtil {
 
-    public static Iterable<CustomerPurchase> normalizeTransaction(Iterable<Transaction> transactions){
+    public static List<CustomerPurchase> normalizeTransactionByDateRange(List<Transaction> transactions, Date start, Date end){
+        for (int i=0; i < transactions.size(); i++){
+            Transaction transaction = transactions.get(i);
+            Date current = transaction.getPurchasedAt();
+            if(!current.after(start) || !current.before(end)){
+                transactions.remove(i);
+            }
+        }
+        return normalizeTransaction(transactions);
+    }
+
+    public static List<CustomerPurchase> normalizeTransaction(List<Transaction> transactions){
         List<CustomerPurchase> result = new ArrayList<>();
         for (Transaction tr : transactions){
             loadTransaction(tr, result);
