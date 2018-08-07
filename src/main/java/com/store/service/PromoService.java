@@ -7,34 +7,43 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceException;
+import java.util.List;
 
 @Service
 public class PromoService {
 
     @Autowired
-    PromoRepository lotRepo;
+    PromoRepository promoRepository;
 
     public Promo findById(int id) throws EntityNotFoundException {
-        return lotRepo.getOne(id);
+        return promoRepository.getOne(id);
+    }
+
+    public List<Promo> getAllPromoByStatus(int status){
+        return promoRepository.findPromoByStatus(status);
+    }
+
+    public List<Promo> getPromoBySeason(String season){
+        return promoRepository.findPromoBySeasonIsContaining(season);
     }
 
     public Iterable<Promo> findAll(){
-        return lotRepo.findAll();
+        return promoRepository.findAll();
     }
 
     public void create(Promo promo){
-        lotRepo.save(promo);
+        promoRepository.save(promo);
     }
 
     public void update(Promo updatedLot) throws PersistenceException{
-        Promo promo = lotRepo.getOne(updatedLot.getId());
+        Promo promo = promoRepository.getOne(updatedLot.getId());
         if (promo.getStatus() != updatedLot.getStatus()){
             throw new PersistenceException("Not possible to change status");
         }
-        lotRepo.save(updatedLot);
+        promoRepository.save(updatedLot);
     }
 
     public void delete(int id){
-        lotRepo.deleteById(id);
+        promoRepository.deleteById(id);
     }
 }

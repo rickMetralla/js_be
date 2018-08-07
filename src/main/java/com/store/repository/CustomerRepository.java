@@ -6,4 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface CustomerRepository extends CrudRepository<Customer, Integer> {
     Customer findByDni(int dni);
+    Customer findByNameContaining(String name);
+    Customer findByPhone(int phone);
 }

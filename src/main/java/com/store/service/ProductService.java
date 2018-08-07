@@ -5,6 +5,8 @@ import com.store.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductService {
 
@@ -15,22 +17,32 @@ public class ProductService {
         return repository.getOne(id);
     }
 
+    public Product findProductByName(String name){
+        return repository.findByNameContaining(name);
+    }
+
+    public List<Product> findProductByModel(String model){
+        return repository.findByModel(model);
+    }
+
     public Iterable<Product> getAll() {
         return repository.findAll();
     }
 
-    public void create (Product product) {
-        repository.save(product);
+    public Product create (Product product) {
+        return repository.save(product);
     }
 
-    public void update(Product updateProd){
-        Product prod = repository.getOne(updateProd.getId());
-        repository.deleteById(updateProd.getId());
-        repository.save(updateProd);
+    public Product update(Product updateProd){
+//        Product prod = repository.getOne(updateProd.getId());
+//        repository.deleteById(updateProd.getId());
+        return repository.save(updateProd);
     }
+
     public void delete(int id) {
         repository.deleteById(id);
     }
+
 
 }
 

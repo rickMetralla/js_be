@@ -292,7 +292,7 @@ public class PromoController {
     private void loadAvailableCustomerList(List<CustomerPurchase> availableCustomers, Promo promo) {
         Date start = promo.getStartAt();
         Date end = promo.getEndAt();
-        List<Transaction> transactions = transactionService.getAll();
+        List<Transaction> transactions = transactionService.getAllTransaction();
         List<PrizeDraw> prizeDraws = prizeDrawService.getAllPrizes();
         Iterable<CustomerPurchase> customers = TransactionUtil.normalizeTransaction(transactions);
         for (CustomerPurchase custPurchase : customers) {

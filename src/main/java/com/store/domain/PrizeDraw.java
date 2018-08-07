@@ -1,7 +1,6 @@
 package com.store.domain;
 
 import javax.persistence.*;
-import java.security.PublicKey;
 
 @Entity
 @Table(name = "prize_draw")

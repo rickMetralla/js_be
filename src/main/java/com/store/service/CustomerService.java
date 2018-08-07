@@ -10,6 +10,14 @@ public class CustomerService {
     @Autowired
     CustomerRepository repo;
 
+    public Customer findByName(String name){
+        return repo.findByNameContaining(name);
+    }
+
+    public Customer findByPhone(int phone){
+        return repo.findByPhone(phone);
+    }
+
     public Customer findByDni (int dni){
         return repo.findByDni(dni);
     }
@@ -18,14 +26,14 @@ public class CustomerService {
         return repo.findAll();
     }
 
-    public void create(Customer customer){
-        repo.save(customer);
+    public Customer create(Customer customer){
+        return repo.save(customer);
     }
 
-    public void update(Customer updatedCustomer){
-        Customer custom = repo.findByDni(updatedCustomer.getDni());
-        repo.deleteById(updatedCustomer.getDni());
-        repo.save(updatedCustomer);
+    public Customer update(Customer updatedCustomer){
+//        Customer custom = repo.findByDni(updatedCustomer.getDni());
+//        repo.deleteById(updatedCustomer.getDni());
+        return repo.save(updatedCustomer);
     }
 
     public void delete(int dni){

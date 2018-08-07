@@ -5,6 +5,8 @@ import com.store.repository.ProductModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductModelService {
 
@@ -18,5 +20,13 @@ public class ProductModelService {
     public int getChanceByModel(String modelName){
         ProductModel productModel = repository.findByName(modelName);
         return productModel.getChance();
+    }
+
+    public ProductModel getByName(String name){
+        return repository.getOne(name);
+    }
+
+    public List<ProductModel> getAllByChance(int chance){
+        return repository.findByChance(chance);
     }
 }

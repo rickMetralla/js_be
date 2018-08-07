@@ -52,7 +52,7 @@ public class TransactionController {
 
     @RequestMapping(value = "/purchases", method = RequestMethod.GET)
     public ResponseEntity<Iterable<CustomerPurchase>> getPurchasers(){
-        Iterable<Transaction> transaction = service.getAll();
+        Iterable<Transaction> transaction = service.getAllTransaction();
         Iterable<CustomerPurchase> normalizedTransaction = TransactionUtil.normalizeTransaction(transaction);
         return new ResponseEntity<Iterable<CustomerPurchase>>(normalizedTransaction , HttpStatus.OK);
     }
@@ -96,70 +96,4 @@ public class TransactionController {
             }
         }
     }
-
-//    private Iterable<CustomerPurchase> normalizeTransaction(Iterable<Transaction> transactions){
-//        List<CustomerPurchase> result = new ArrayList<>();
-//        for (Transaction tr : transactions){
-//           loadTransaction(tr, result);
-//        }
-//        return result;
-//    }
-//
-//    private void loadTransaction(Transaction tr, List<CustomerPurchase> result) {
-//        int indexCustomer = getIndexCustomer(tr.getCustDni(), result);
-//        if (indexCustomer > -1) {
-//            ProductOrder prod = new ProductOrder(tr.getOrder());
-//            List<Invoice> res = result.get(indexCustomer).getInvoices();
-//            for (Invoice cPurch : res) {
-//                if(cPurch.getPurchasedAt().compareTo(tr.getPurchasedAt()) == 0){
-//                    int i = result.get(indexCustomer).getInvoices().indexOf(cPurch);
-//                    result.get(indexCustomer).getInvoices().get(i).getProductOrders().add(prod);
-//                    return;
-//                }
-//            }
-//            List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
-//                add(new ProductOrder(tr.getOrder()));
-//            }};
-//
-//            Invoice custOrder = new Invoice(lpo, tr.getPurchasedAt());
-//            result.get(indexCustomer).getInvoices().add(custOrder);
-//        } else {
-//            List<ProductOrder> lpo = new ArrayList<ProductOrder>() {{
-//                add(new ProductOrder(tr.getOrder()));
-//            }};
-//
-//            List<Invoice> listCustomerOrders = new ArrayList<Invoice>() {{
-//                add(new Invoice(lpo, tr.getPurchasedAt()));
-//            }};
-//            CustomerPurchase cp = new CustomerPurchase(tr.getCustDni(), listCustomerOrders);
-//            result.add(cp);
-//        }
-//    }
-//
-//    private int getIndexCustomer(int custDni, List<CustomerPurchase> result) {
-//        if(!result.isEmpty()){
-//            for (CustomerPurchase cp : result) {
-//                if (cp.getCustDni() == custDni){
-//                    return result.indexOf(cp);
-//                }
-//            }
-//        }
-//        return -1;
-//    }
-
-//    private void updateLuckyCustomer(Customer luckyCustomer) {
-//        //luckyCustomer.setWinner(true);
-//        customerService.update(luckyCustomer);
-//    }
-
-//    private Iterable<Transaction> getAvalaible(Iterable<Integer> dni){
-//        List<Transaction> res = new ArrayList<>();
-////        for (int i:dni) {
-////            Customer cu = customerService.findByDni(i);
-//////            if (!cu.isWinner()){
-//////                res.add(cu);
-//////            }
-////        }
-//        return res;
-//    }
 }

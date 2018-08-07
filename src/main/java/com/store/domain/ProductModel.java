@@ -7,7 +7,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-//@Embeddable
 @Table(name = "product_model")
 public class ProductModel {
 

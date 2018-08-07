@@ -16,12 +16,20 @@ public class PromoStatusService {
         return promoStatusRepo.findAll();
     }
 
+    public PromoStatus getPromoStatusByStatus(String status){
+        return promoStatusRepo.findPromoStatusByStatus(status);
+    }
+
     public PromoStatus getOneById(int id){
         return promoStatusRepo.getOne(id);
     }
 
-    public void createPromoStatus(PromoStatus promoStatus){
-        promoStatusRepo.save(promoStatus);
+    public PromoStatus createPromoStatus(PromoStatus promoStatus){
+        return promoStatusRepo.save(promoStatus);
+    }
+
+    public PromoStatus updatePromoStatus(PromoStatus updatedPromoStatus){
+        return promoStatusRepo.save(updatedPromoStatus);
     }
 
     public void deletePromoStatus(int id){

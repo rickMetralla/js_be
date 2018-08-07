@@ -10,6 +10,10 @@ import java.util.List;
 
 //@Repository
 public interface PrizeDrawRepository extends JpaRepository<PrizeDraw, Integer> {
-//    @Query("SELECT custDni FROM prize_draw where promoId=:promoId")
-//    public List<Integer> findDniByPromoId(@Param("promoId") Integer promoId);
+    List<PrizeDraw> findPrizeDrawByWinner(boolean win);
+    List<PrizeDraw> findPrizeDrawByPromoId(int promo);
+    List<PrizeDraw> findPrizeDrawByCustDni(int dni);
+    List<PrizeDraw> findPrizeDrawByChances(int chance);
+
+    PrizeDraw findPrizeDrawByCustDniAndPromoId(int dni, int promoId);
 }

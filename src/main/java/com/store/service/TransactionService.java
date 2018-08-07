@@ -13,11 +13,15 @@ public class TransactionService {
     @Autowired
     TransactionRepository repo;
 
-    public void createBuy(Transaction transaction) {
-        repo.save(transaction);
+    public Transaction createBuy(Transaction transaction) {
+        return repo.save(transaction);
     }
 
-    public List<Transaction> getAll(){
+    public List<Transaction> getAllTransaction(){
         return repo.findAll();
+    }
+
+    public List<Transaction> getAllTransactionByCustDni(int dni){
+        return repo.findTransactionByCustDni(dni);
     }
 }
