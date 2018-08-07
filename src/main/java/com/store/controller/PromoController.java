@@ -112,7 +112,6 @@ public class PromoController {
         return new ResponseEntity<String>("Promo successfully deleted", HttpStatus.NO_CONTENT);
     }
 
-
     @RequestMapping(value = "/promos/{idPromo}/activate", method = RequestMethod.PUT)
     public ResponseEntity<String> activatePromo(@PathVariable Integer idPromo){
         Promo promo = promoService.findById(idPromo);
