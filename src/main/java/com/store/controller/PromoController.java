@@ -183,7 +183,7 @@ public class PromoController {
     }
 
     @RequestMapping(value = "/promos/{idPromo}/active/customers", method = RequestMethod.GET)
-    public ResponseEntity<List<CustomerPurchase>> getAvailableCustomerByPromoAfterActive(@PathVariable Integer idPromo){
+    public ResponseEntity<List<CustomerPurchase>> getAvailableCustomerByPromoAfterActive(@PathVariable("idPromo") final Integer idPromo){
         Promo promo = promoService.findById(idPromo);
         try{
             if(promo.getStatus() != 1){
@@ -260,11 +260,21 @@ public class PromoController {
         for (Prize prize : prizes) {
             int luckyDni = getAwards(availableCustomers, promo);
             updateWinner(prizeDraws, luckyDni, idPromo, prize.getId());
+            removeAvailableCustomerAfterWinPrize(availableCustomers, luckyDni);
             Customer customer = customerService.findByDni(luckyDni);
             customerWinners.add(customer);
             LOGGER.log(Level.SEVERE, "Winner after make draw prize: {0}", customer.toString());
         }
         return new ResponseEntity<>(customerWinners, HttpStatus.OK);
+    }
+
+    private void removeAvailableCustomerAfterWinPrize(List<CustomerPurchase> availableCustomers, int dni) {
+        for(int i = 0; i < availableCustomers.size(); i++){
+            if(availableCustomers.get(i).getCustDni() == dni){
+                availableCustomers.remove(i);
+                return;
+            }
+        }
     }
 
     private List<CustomerPurchase> loadAvailableCustomersActivePromo(List<PrizeDraw> prizeDrawList, Promo promo){
@@ -313,7 +323,7 @@ public class PromoController {
     private int getAwards(Iterable<CustomerPurchase> customers, Promo promo) {
         List<Integer> dnisAmphora = new ArrayList<>();
         for (CustomerPurchase customer : customers){
-            setChancesForPrize(customer, dnisAmphora/*, products*/, promo);
+            setChancesForPrize(customer, dnisAmphora, promo);
         }
         return DrawUtil.makeDrawPrize(dnisAmphora);
     }

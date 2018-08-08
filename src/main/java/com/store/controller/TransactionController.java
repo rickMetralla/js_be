@@ -58,8 +58,15 @@ public class TransactionController {
     }
 
     @RequestMapping(value = "/purchases/{dni}", method = RequestMethod.GET)
-    public ResponseEntity<Transaction> getPurchase(){
-        return null;
+    public ResponseEntity<CustomerPurchase> getPurchase(@PathVariable int dni){
+        List<Transaction> transaction = service.getAllTransactionByCustDni(dni);
+        List<CustomerPurchase> customerPurchase =  TransactionUtil.normalizeTransaction(transaction);
+        if(customerPurchase.size() == 1){
+            return new ResponseEntity<CustomerPurchase>(customerPurchase.get(0), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<CustomerPurchase>(HttpStatus.NOT_FOUND);
+        }
     }
 
     private void validatePurchase(CustomerPurchase customerPurchase) throws Exception {
