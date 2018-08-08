@@ -27,14 +27,19 @@ public class PrizeDraw {
     @Column(name = "winner")
     private boolean winner;
 
+    @Column(name = "won_article")
+    private
+    Integer wonArticle;
+
     public PrizeDraw(){
     }
 
-    public PrizeDraw(int custDni, int promoId, int chances, boolean winner){
+    public PrizeDraw(int custDni, int promoId, int chances, boolean winner, Integer wonArticle){
         this.custDni = custDni;
         this.promoId = promoId;
         this.chances = chances;
         this.winner = winner;
+        this.wonArticle = wonArticle;
     }
 
     public int getCustDni() {
@@ -71,5 +76,13 @@ public class PrizeDraw {
 
     public void setWinner(boolean winner) {
         this.winner = winner;
+    }
+
+    public Integer getWonArticle() {
+        return wonArticle;
+    }
+
+    public void setWonArticle(Integer wonArticle) {
+        this.wonArticle = wonArticle;
     }
 }

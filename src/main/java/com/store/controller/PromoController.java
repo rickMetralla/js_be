@@ -29,6 +29,9 @@ public class PromoController {
     PrizeDrawService prizeDrawService;
 
     @Autowired
+    PrizeService prizeService;
+
+    @Autowired
     TransactionService transactionService;
     
     @Autowired
@@ -41,10 +44,11 @@ public class PromoController {
     CustomerService customerService;
 
     @Autowired
-    TransactionService transService;
+    ProductService productService;
 
     @Autowired
-    ProductService prodService;
+    ProductModelService productModelService;
+
     Logger LOGGER = LoggerWrapper.getInstance().logger;
 
     @RequestMapping(value = "/promoStatus", method = RequestMethod.GET)
@@ -116,22 +120,19 @@ public class PromoController {
     public ResponseEntity<String> activatePromo(@PathVariable Integer idPromo){
         Promo promo = promoService.findById(idPromo);
         try {
-            if(promo.getSeason() == null){
-                return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            if(promo.getStatus() == 2){
+                promo.setStatus(1);
+                promoService.update(promo);
+                List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
+                loadPrizeDraw(availableCustomers, promo);
+                return new ResponseEntity<String>("Activation completed", HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
+                        HttpStatus.METHOD_NOT_ALLOWED);
             }
         }catch (PersistenceException e){
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        }
-        if(promo.getStatus() == 2){
-            promo.setStatus(1);
-            promoService.update(promo);
-            List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
-            loadPrizeDraw(availableCustomers, promo);
-            return new ResponseEntity<String>("Activation completed", HttpStatus.OK);
-        }
-        else{
-            return new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
-                    HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
 
@@ -188,6 +189,7 @@ public class PromoController {
             if(promo.getStatus() != 1){
                 return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
             }
+//            if()
         }catch (EntityNotFoundException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -196,29 +198,73 @@ public class PromoController {
         return new ResponseEntity<List<CustomerPurchase>>(availableCustomers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{idPromo}/drawprize", method = RequestMethod.POST)
-    public ResponseEntity<Customer> makeDrawPrize(@PathVariable Integer idPromo){
-        Promo promo;
+//    @RequestMapping(value = "/{idPromo}/drawprize", method = RequestMethod.POST)
+//    public ResponseEntity<Customer> makeDrawPrize(@PathVariable Integer idPromo){
+//        Promo promo = promoService.findById(idPromo);
+//        List<Prize> prizes = prizeService.getAllPrizesByPromoId(idPromo);
+//
+//        try {
+////            promo = promoService.findById(idPromo);
+//            if(promo.getStatus() != 1){
+//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//            }
+//            LOGGER.log(Level.INFO, "Make draw prize request for promo with ID: {0}", idPromo);
+////            List<Prize> prizes = prizeService.getAllPrizesByPromoId(idPromo);
+//            if(prizes.size() == 0) {
+//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//            }
+//        } catch (PersistenceException e){
+//            LOGGER.log(Level.SEVERE, "Make draw prize failed for promo with ID: {0}", idPromo);
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        // get available customer for prize's promotion
+//        List<PrizeDraw> prizeDraws = prizeDrawService.getAllByPromoId(idPromo);
+//        List<CustomerPurchase> availableCustomers = loadAvailableCustomersActivePromo(prizeDraws, promo);
+//        LOGGER.log(Level.INFO, String.format("Available users: %d for promo: %d", idPromo, availableCustomers.size()));
+//
+//        //draw prize with all available customers
+//        int luckyDni = getAwards(availableCustomers, promo);
+//        updateWinner(prizeDraws, luckyDni, idPromo, prizes.get(0).getId());
+//
+//        Customer customer = customerService.findByDni(luckyDni);
+//        LOGGER.log(Level.SEVERE, "Winner after make draw prize: {0}", customer.toString());
+//        return new ResponseEntity<Customer>(customer, HttpStatus.OK);
+//    }
+
+    @RequestMapping(value = "promos/{idPromo}/drawprizes", method = RequestMethod.POST)
+    public ResponseEntity<List<Customer>> makeDrawPrizes(@PathVariable Integer idPromo){
+        Promo promo = promoService.findById(idPromo);
+        List<Prize> prizes = prizeService.getAllPrizesByPromoId(idPromo);
+
         try {
-            promo = promoService.findById(idPromo);
             if(promo.getStatus() != 1){
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             LOGGER.log(Level.INFO, "Make draw prize request for promo with ID: {0}", idPromo);
+            if(prizes.size() == 0) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         } catch (PersistenceException e){
             LOGGER.log(Level.SEVERE, "Make draw prize failed for promo with ID: {0}", idPromo);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
+
+        // get available customer for prize's promotion
+        List<PrizeDraw> prizeDraws = prizeDrawService.getAllByPromoId(idPromo);
+        List<CustomerPurchase> availableCustomers = loadAvailableCustomersActivePromo(prizeDraws, promo);
         LOGGER.log(Level.INFO, String.format("Available users: %d for promo: %d", idPromo, availableCustomers.size()));
 
-        int luckyDni = getAwards(availableCustomers/*, allProducts*/, promo);
-        List<PrizeDraw> winnerToUpdate = prizeDrawService.getAllPrizes();
-        updateWinner(winnerToUpdate, luckyDni, promo);
-
-        Customer customer = customerService.findByDni(luckyDni);
-        LOGGER.log(Level.SEVERE, "Winner after make draw prize: {0}", customer.toString());
-        return new ResponseEntity<Customer>(customer, HttpStatus.OK);
+        //draw prize with all available customers and all prizes for current promotion
+        List<Customer> customerWinners = new ArrayList<>();
+        for (Prize prize : prizes) {
+            int luckyDni = getAwards(availableCustomers, promo);
+            updateWinner(prizeDraws, luckyDni, idPromo, prize.getId());
+            Customer customer = customerService.findByDni(luckyDni);
+            customerWinners.add(customer);
+            LOGGER.log(Level.SEVERE, "Winner after make draw prize: {0}", customer.toString());
+        }
+        return new ResponseEntity<>(customerWinners, HttpStatus.OK);
     }
 
     private List<CustomerPurchase> loadAvailableCustomersActivePromo(List<PrizeDraw> prizeDrawList, Promo promo){
@@ -241,19 +287,18 @@ public class PromoController {
     }
 
     private void loadPrizeDraw(List<CustomerPurchase> availableCustomers, Promo promo) {
-        for (CustomerPurchase customer :
-                availableCustomers) {
+        for (CustomerPurchase customer : availableCustomers) {
             int totalCustomerChances = setChancesForPrize(customer, new ArrayList<>(), promo);
-            PrizeDraw pr = new PrizeDraw(customer.getCustDni(), promo.getId(), totalCustomerChances, false);
+            PrizeDraw pr = new PrizeDraw(customer.getCustDni(), promo.getId(), totalCustomerChances, false, null);
             prizeDrawService.create(pr);
         }
     }
 
-    private void updateWinner(List<PrizeDraw> winnerToUpdate, int luckyDni, Promo promo) {
-        for (PrizeDraw prizeDraw :
-                winnerToUpdate) {
-            if(prizeDraw.getPromoId() == promo.getId() && prizeDraw.getCustDni() == luckyDni){
+    private void updateWinner(List<PrizeDraw> winnerToUpdate, int luckyDni, int promoId, int prize) {
+        for (PrizeDraw prizeDraw : winnerToUpdate) {
+            if(prizeDraw.getPromoId() == promoId && prizeDraw.getCustDni() == luckyDni){
                 prizeDraw.setWinner(true);
+                prizeDraw.setWonArticle(prize);
                 prizeDrawService.update(prizeDraw);
             }
         }
@@ -265,7 +310,7 @@ public class PromoController {
         return availableCustomers;
     }
 
-    private int getAwards(Iterable<CustomerPurchase> customers/*, Iterable<Product> products*/, Promo promo) {
+    private int getAwards(Iterable<CustomerPurchase> customers, Promo promo) {
         List<Integer> dnisAmphora = new ArrayList<>();
         for (CustomerPurchase customer : customers){
             setChancesForPrize(customer, dnisAmphora/*, products*/, promo);
@@ -273,14 +318,14 @@ public class PromoController {
         return DrawUtil.makeDrawPrize(dnisAmphora);
     }
 
-    private int setChancesForPrize(CustomerPurchase customer, List<Integer> dnisAmphora/*,
-                                           Iterable<Product> listProducts*/, Promo promo) {
-        Iterable<Product> listProducts = prodService.getAll();
+    private int setChancesForPrize(CustomerPurchase customer, List<Integer> dnisAmphora, Promo promo) {
+        Iterable<Product> listProducts = productService.getAll();
         List<Product> products = getProducts(customer, listProducts, promo);
         int totalCustomerChances = 0;
         if (!products.isEmpty()){
             for (Product product : products){
-                int chances = DrawUtil.getChanceByModel(product.getModel()); //should retrieve from db
+//                int chances = DrawUtil.getChanceByModel(product.getModel()); //should retrieve from db
+                int chances = productModelService.getChanceByModel(product.getModel()); //should retrieve from db
                 totalCustomerChances = totalCustomerChances + chances;
                 DrawUtil.setChancesToWin(customer, dnisAmphora, chances);
             }

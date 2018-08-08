@@ -17,6 +17,10 @@ public class PrizeService {
         return prizeRepository.findAll();
     }
 
+    public List<Prize> getAllPrizesByPromoId(int promoId){
+        return prizeRepository.getPrizesByPromoId(promoId);
+    }
+
     public Prize getOnePrizeById(int id){
         return prizeRepository.getOne(id);
     }
