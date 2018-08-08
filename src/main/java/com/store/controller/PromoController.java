@@ -5,12 +5,15 @@ import com.store.domain.*;
 import com.store.dto.Invoice;
 import com.store.dto.CustomerPurchase;
 import com.store.dto.ProductOrder;
+import com.store.handlers.CustomRestExceptionHandler;
 import com.store.service.*;
 import com.store.utils.DrawUtil;
 import com.store.utils.TransactionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -116,8 +119,9 @@ public class PromoController {
         return new ResponseEntity<String>("Promo successfully deleted", HttpStatus.NO_CONTENT);
     }
 
+
     @RequestMapping(value = "/promos/{idPromo}/activate", method = RequestMethod.PUT)
-    public ResponseEntity<String> activatePromo(@PathVariable Integer idPromo){
+    public ResponseEntity<String> activatePromo(@PathVariable Integer idPromo) throws HttpRequestMethodNotSupportedException{
         Promo promo = promoService.findById(idPromo);
         try {
             if(promo.getStatus() == 2){
@@ -128,8 +132,9 @@ public class PromoController {
                 return new ResponseEntity<String>("Activation completed", HttpStatus.OK);
             }
             else{
-                return new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
-                        HttpStatus.METHOD_NOT_ALLOWED);
+//                return new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
+//                        HttpStatus.METHOD_NOT_ALLOWED);
+                throw new HttpRequestMethodNotSupportedException("example");
             }
         }catch (PersistenceException e){
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
