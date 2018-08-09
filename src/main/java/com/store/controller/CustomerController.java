@@ -35,13 +35,19 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/customers", method = RequestMethod.POST)
-    public ResponseEntity<String> createCustomer(@RequestBody Customer customer){
-        service.create(customer);
-        return new ResponseEntity<String>("Customer created successfully", HttpStatus.CREATED);
+    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer){
+//        validateCustomerFields(customer);
+        if(customer.validate()){
+            return new ResponseEntity<Customer>(service.create(customer), HttpStatus.CREATED);
+        }
+        else{
+            return new ResponseEntity<Customer>(HttpStatus.METHOD_NOT_ALLOWED);
+        }
     }
 
     @RequestMapping(value = "/customers", method = RequestMethod.PUT)
     public ResponseEntity<String> updateCustomer(@RequestBody Customer updatedCustomer){
+//        validateCustomerFields(customer);
         if(service.findByDni(updatedCustomer.getDni()) == null){
             return new ResponseEntity<String>("Customer not found", HttpStatus.NOT_FOUND);
         }

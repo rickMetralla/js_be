@@ -81,4 +81,12 @@ public class Customer {
     public String toString(){
         return "name: " + name + ", dni: " + dni;
     }
+
+    public boolean validate() {
+        if(this.name == "" || !this.name.matches("[a-zA-Z ]+")){
+            return false;
+        }
+        return true;
+
+    }
 }
