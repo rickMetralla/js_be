@@ -134,7 +134,7 @@ public class PromoController {
             else{
 //                return new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
 //                        HttpStatus.METHOD_NOT_ALLOWED);
-                throw new HttpRequestMethodNotSupportedException("example");
+                throw new HttpRequestMethodNotSupportedException("Activation of promo not allowed, inactive status required");
             }
         }catch (PersistenceException e){
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);

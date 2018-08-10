@@ -32,9 +32,9 @@ public class Product {
     @Column(name = "stock")
     private int stock;
 
-    @Column(name = "date_created")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
-    private Date dateCreated;
+//    @Column(name = "date_created")
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
+//    private Date dateCreated;
 
     public String getModel() {
         return model;
@@ -56,15 +56,15 @@ public class Product {
         return id;
     }
 
-    public Date getDateCreated() {
-        if (dateCreated == null)
-            dateCreated = new Date(Calendar.getInstance().getTime().getTime());
-        return dateCreated;
-    }
+//    public Date getDateCreated() {
+//        if (dateCreated == null)
+//            dateCreated = new Date(Calendar.getInstance().getTime().getTime());
+//        return dateCreated;
+//    }
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
+//    public void setDateCreated(Date dateCreated) {
+//        this.dateCreated = dateCreated;
+//    }
 
     public int getStock() {
         return stock;
