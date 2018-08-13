@@ -14,6 +14,7 @@ import com.store.utils.TransactionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class TransactionController {
     Logger LOGGER = LoggerWrapper.getInstance().logger;
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
-    public ResponseEntity<String> createPurchase(@RequestBody CustomerPurchase customerPurchase){
+    public ResponseEntity<CustomerPurchase> createPurchase(@RequestBody CustomerPurchase customerPurchase) throws HttpRequestMethodNotSupportedException {
         LOGGER.log(Level.INFO, "Applying purchase request for: {0}", customerPurchase.toString());
         try {
             validatePurchase(customerPurchase);
@@ -44,10 +45,10 @@ public class TransactionController {
         catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Not possible to perform purchase: {0}", e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new HttpRequestMethodNotSupportedException(e.getMessage());
         }
         LOGGER.log(Level.INFO, "Purchase transaction for: {0} Completed", customerPurchase.toString());
-        return new ResponseEntity<String>("Successfully created", HttpStatus.CREATED);
+        return new ResponseEntity<CustomerPurchase>(HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/purchases", method = RequestMethod.GET)

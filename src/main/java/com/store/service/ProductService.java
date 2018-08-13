@@ -34,8 +34,9 @@ public class ProductService {
     }
 
     public Product update(Product updateProd){
-//        Product prod = repository.getOne(updateProd.getId());
-//        repository.deleteById(updateProd.getId());
+        Product product = repository.getOne(updateProd.getId());
+        int updateStock = product.getStock() + updateProd.getStock();
+        updateProd.setStock(updateStock);
         return repository.save(updateProd);
     }
 

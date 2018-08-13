@@ -45,13 +45,12 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.PUT)
-    public ResponseEntity<String> updateProduct(@RequestBody Product updatedProduct){
+    public ResponseEntity<Product> updateProduct(@RequestBody Product updatedProduct){
         if(service.findById(updatedProduct.getId()) == null){
-            return new ResponseEntity<String>("Product not found", HttpStatus.NOT_FOUND);
-        }
-        else{
-            service.update(updatedProduct);
-            return new ResponseEntity<String>("Product updated successfully", HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }else{
+//            service.update(updatedProduct);
+            return new ResponseEntity<Product>(service.update(updatedProduct), HttpStatus.OK);
         }
     }
 
