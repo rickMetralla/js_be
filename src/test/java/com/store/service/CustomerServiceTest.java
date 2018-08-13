@@ -40,8 +40,7 @@ public class CustomerServiceTest {
                     add(new Customer("Rick", 6432037, "calle", 76907520, "rick@bazzoka.com"));
                 }});
         Iterable<Customer> result = customerService.getAll();
-        for (Customer customer :
-                result) {
+        for (Customer customer : result) {
             assertEquals(expectedCustomer.getDni(), customer.getDni());
         }
     }
