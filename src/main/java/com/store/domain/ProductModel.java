@@ -39,4 +39,16 @@ public class ProductModel {
     public void setChance(int chance) {
         this.chance = chance;
     }
+
+    public String validateFields() {
+        String message = "";
+        if(this.name == "" || this.name.length() > 101){
+            message = "name not valid";
+        } else if (this.description.length() > 256){
+            message = "description too long, needs at most 255 characters";
+        } else if (this.chance > 1001){
+            message = "chance should be equal or less than 1000";
+        }
+        return message;
+    }
 }

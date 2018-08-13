@@ -31,8 +31,8 @@ public class PromoService {
         return promoRepository.findAll();
     }
 
-    public void create(Promo promo){
-        promoRepository.save(promo);
+    public Promo create(Promo promo){
+        return promoRepository.save(promo);
     }
 
     public void update(Promo updatedLot) throws PersistenceException{

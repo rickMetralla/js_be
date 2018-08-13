@@ -5,6 +5,7 @@ import com.store.repository.PrizeDrawRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,8 +18,15 @@ public class PrizeDrawService {
         return prizeDrawRepository.findAll();
     }
 
-    public List<PrizeDraw> getAllWinners(boolean winner){
-        return prizeDrawRepository.findPrizeDrawByWinner(winner);
+    public List<PrizeDraw> getAllWinners(boolean winner, int promoId){
+        List<PrizeDraw> prizeDrawList = prizeDrawRepository.findPrizeDrawByWinner(winner);
+        List<PrizeDraw> result = new ArrayList<>();
+        for (PrizeDraw prizeDraw : prizeDrawList) {
+            if (prizeDraw.getPromoId() == promoId) {
+                result.add(prizeDraw);
+            }
+        }
+        return result;
     }
 
     public List<PrizeDraw> getAllByPromoId(int promo){

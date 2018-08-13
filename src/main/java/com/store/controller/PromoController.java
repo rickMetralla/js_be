@@ -54,6 +54,19 @@ public class PromoController {
 
     Logger LOGGER = LoggerWrapper.getInstance().logger;
 
+    @RequestMapping(value = "/promos/{promoId}/prizedraws", method = RequestMethod.GET)
+    public ResponseEntity<List<PrizeDraw>> getPrizeDrawByPromoId(@PathVariable int promoId){
+        return new ResponseEntity<List<PrizeDraw>>(prizeDrawService.getAllByPromoId(promoId),
+                HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/promos/{promoId}/prizedraws/{winners}", method = RequestMethod.GET)
+    public ResponseEntity<List<PrizeDraw>> getPrizeDrawByPromoId(@PathVariable("promoId") int promoId,
+                                                                 @PathVariable("winners") boolean winners){
+        return new ResponseEntity<List<PrizeDraw>>(prizeDrawService.getAllWinners(winners, promoId),
+                HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/promoStatus", method = RequestMethod.GET)
     public ResponseEntity<List<PromoStatus>> getAllPromoStatus(){
         return new ResponseEntity<List<PromoStatus>>(promoStatusService.getAllStatus(),
@@ -67,9 +80,9 @@ public class PromoController {
     }
 
     @RequestMapping(value = "/promoStatus", method = RequestMethod.POST)
-    public ResponseEntity<String> createPromoStatus(@RequestBody PromoStatus promoStatus){
-        promoStatusService.createPromoStatus(promoStatus);
-        return new ResponseEntity<String>("successfully created", HttpStatus.CREATED);
+    public ResponseEntity<PromoStatus> createPromoStatus(@RequestBody PromoStatus promoStatus){
+//        promoStatusService.createPromoStatus(promoStatus);
+        return new ResponseEntity<PromoStatus>(promoStatusService.createPromoStatus(promoStatus), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/promos/{promoId}", method = RequestMethod.GET)
@@ -93,13 +106,16 @@ public class PromoController {
     }
 
     @RequestMapping(value = "/promos", method = RequestMethod.POST)
-    public ResponseEntity<String> createPromo(@RequestBody Promo promo){
-        if(verifyDate(promo)){
-            promo.setStatus(2);
-            promoService.create(promo);
-            return new ResponseEntity<String>("Promo successfully created", HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<String>("Not possible to create, date collision", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Promo> createPromo(@RequestBody Promo promo) throws HttpRequestMethodNotSupportedException {
+        try{
+            if(verifyDate(promo)){
+                promo.setStatus(2);
+                return new ResponseEntity<Promo>(promoService.create(promo), HttpStatus.CREATED);
+            }else {
+                throw new HttpRequestMethodNotSupportedException("Not possible to create, date collision");
+            }
+        } catch (HttpRequestMethodNotSupportedException error){
+            throw error;
         }
     }
 
@@ -114,14 +130,17 @@ public class PromoController {
     }
 
     @RequestMapping(value = "/promos/{promoId}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deletePromoById(@RequestBody Integer promoId){
+    public ResponseEntity deletePromoById(@PathVariable Integer promoId) throws HttpRequestMethodNotSupportedException {
+        Promo promo = promoService.findById(promoId);
+        if(promo.getStatus() != 2){
+            throw new HttpRequestMethodNotSupportedException("Not possible to delete, promotion needs inactive status.");
+        }
         promoService.delete(promoId);
-        return new ResponseEntity<String>("Promo successfully deleted", HttpStatus.NO_CONTENT);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-
     @RequestMapping(value = "/promos/{idPromo}/activate", method = RequestMethod.PUT)
-    public ResponseEntity<String> activatePromo(@PathVariable Integer idPromo) throws HttpRequestMethodNotSupportedException{
+    public ResponseEntity<Promo> activatePromo(@PathVariable Integer idPromo) throws HttpRequestMethodNotSupportedException{
         Promo promo = promoService.findById(idPromo);
         try {
             if(promo.getStatus() == 2){
@@ -129,15 +148,13 @@ public class PromoController {
                 promoService.update(promo);
                 List<CustomerPurchase> availableCustomers = findAvailableCustomerByPromo(promo);
                 loadPrizeDraw(availableCustomers, promo);
-                return new ResponseEntity<String>("Activation completed", HttpStatus.OK);
+                return new ResponseEntity<Promo>(promo, HttpStatus.OK);
             }
             else{
-//                return new ResponseEntity<String>("Activation of promo not allowed, inactive status required",
-//                        HttpStatus.METHOD_NOT_ALLOWED);
                 throw new HttpRequestMethodNotSupportedException("Activation of promo not allowed, inactive status required");
             }
         }catch (PersistenceException e){
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

@@ -76,7 +76,6 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
-//    @ExceptionHandler({ HttpRequestMethodNotSupportedException.class })
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
                                                                          HttpHeaders headers, HttpStatus status,
@@ -84,7 +83,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         StringBuilder builder = new StringBuilder();
         builder.append(ex.getMethod());
         builder.append(
-                " method is not supported for this request. Bazzoka Supported methods are ");
+                " ");
 //        ex.getSupportedHttpMethods().forEach(t -> builder.append(t + " "));
 
         RestError apiError = new RestError(HttpStatus.METHOD_NOT_ALLOWED,

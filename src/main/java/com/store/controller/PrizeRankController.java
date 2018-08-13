@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
@@ -41,10 +42,15 @@ public class PrizeRankController {
         return new ResponseEntity<Iterable<Prize>>(prizeService.getAllPrizes(), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/{promoId}", method = RequestMethod.GET)
+    public ResponseEntity<Iterable<Prize>> getAllPrizesByPromoId(@PathVariable int promoId){
+        List<Prize> prizes = prizeService.getAllPrizesByPromoId(promoId);
+        return new ResponseEntity<Iterable<Prize>>(prizes, HttpStatus.OK);
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Prize> savePrize(@RequestBody Prize prize){
 //        validatePrizeFields(prize);
         return new ResponseEntity<Prize>(prizeService.create(prize), HttpStatus.OK);
     }
-
 }
