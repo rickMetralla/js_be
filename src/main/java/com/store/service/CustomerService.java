@@ -5,6 +5,8 @@ import com.store.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CustomerService {
     @Autowired
@@ -22,7 +24,7 @@ public class CustomerService {
         return repo.findByDni(dni);
     }
 
-    public Iterable<Customer> getAll(){
+    public List<Customer> getAll(){
         return repo.findAll();
     }
 

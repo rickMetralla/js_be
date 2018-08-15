@@ -1,10 +1,9 @@
 package com.store.repository;
 
 import com.store.domain.Customer;
-import org.springframework.data.repository.CrudRepository;
-//import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CustomerRepository extends CrudRepository<Customer, Integer> {
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     Customer findByDni(int dni);
     Customer findByNameContaining(String name);
     Customer findByPhone(int phone);
