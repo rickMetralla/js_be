@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.logging.Logger;
 
 @RestController
@@ -19,14 +20,14 @@ public class CustomerController {
     Logger LOGGER = LoggerWrapper.getInstance().logger;
 
     @RequestMapping(value = "/customers/{dni}", method = RequestMethod.GET)
-    public ResponseEntity<Customer> getCustomerById(@PathVariable Integer dni){
-        Customer one = service.findByDni(dni);
-        if (one.getName() == null){
-            return new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Customer> getCustomerById(@PathVariable Integer dni) throws EntityNotFoundException {
+        Customer one;
+        try{
+            one = service.findByDni(dni);
+        }catch (EntityNotFoundException error){
+            throw error;
         }
-        else {
-            return new ResponseEntity<Customer>(service.findByDni(dni), HttpStatus.OK);
-        }
+        return new ResponseEntity<Customer>(one, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/customers", method = RequestMethod.GET)

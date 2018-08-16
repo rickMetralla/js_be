@@ -5,6 +5,7 @@ import com.store.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -20,8 +21,13 @@ public class CustomerService {
         return repo.findByPhone(phone);
     }
 
-    public Customer findByDni (int dni){
-        return repo.findByDni(dni);
+    public Customer findByDni (int dni) throws EntityNotFoundException {
+        Customer customer = repo.findByDni(dni);
+        if(customer != null){
+            return customer;
+        }else{
+            throw new EntityNotFoundException(String.format("Customer with dni %s not found.", dni));
+        }
     }
 
     public List<Customer> getAll(){

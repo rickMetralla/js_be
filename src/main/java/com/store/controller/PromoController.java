@@ -86,15 +86,14 @@ public class PromoController {
     }
 
     @RequestMapping(value = "/promos/{promoId}", method = RequestMethod.GET)
-    public ResponseEntity<Promo> getPromo(@PathVariable Integer promoId){
+    public ResponseEntity<Promo> getPromo(@PathVariable Integer promoId) throws EntityNotFoundException {
         LOGGER.log(Level.INFO, "GET request for promotion with id {0}", promoId);
-        Promo promo = promoService.findById(promoId);
+        Promo promo;
         try{
-            if(promo.getSeason() == null)
-                return new ResponseEntity<Promo>(HttpStatus.NOT_FOUND);
-        } catch (EntityNotFoundException e){
+            promo = promoService.findById(promoId);
+        } catch (EntityNotFoundException error){
             LOGGER.log(Level.INFO, "Promotion with id {0} not found", promoId);
-            return new ResponseEntity<Promo>(HttpStatus.NOT_FOUND);
+            throw error;
         }
         LOGGER.log(Level.INFO, "Promotion found and retrieved with id {0}", promoId);
         return new ResponseEntity<Promo>(promo, HttpStatus.OK);

@@ -15,6 +15,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
@@ -113,5 +114,17 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
         return new ResponseEntity<Object>(
                 apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
+    /**
+     *
+     * @param ex
+     * @param request
+     * @return
+     */
+    @ExceptionHandler({EntityNotFoundException.class})
+    public ResponseEntity<Object> handleNotFoundEntity(EntityNotFoundException ex, WebRequest request){
+        RestError error = new RestError(HttpStatus.NOT_FOUND, "[Exception] Error found: " + ex.toString(), "Entity not found. " + ex.getMessage());
+        return new ResponseEntity<Object>(error, new HttpHeaders(), error.getStatus());
     }
 }
