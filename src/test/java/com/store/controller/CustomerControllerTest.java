@@ -1,20 +1,16 @@
 package com.store.controller;
 
 import com.store.domain.Customer;
-import com.store.handlers.RestError;
 import com.store.service.CustomerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -69,11 +65,13 @@ public class CustomerControllerTest {
 
         controllerMvc.perform(get("/customers/123"))
                 .andExpect(status().is4xxClientError())
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errors[0]", is("Entity not found. Customer with dni 123 not found.")));
     }
 
    @Test
    public void getCustomersTest() throws Exception{
+
        Customer customer = new Customer("rick", 123, "calle", 54466, "rick@rick.com");
        Customer customer1 = new Customer("jhon", 321, "av", 73215151, "jhon@jhon.com");
 
@@ -95,4 +93,5 @@ public class CustomerControllerTest {
        verify(customerService, times(1)).getAll();
        verifyNoMoreInteractions(customerService);
    }
+
 }
