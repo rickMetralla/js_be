@@ -35,12 +35,12 @@ public class PromoService {
         return promoRepository.save(promo);
     }
 
-    public void update(Promo updatedLot) throws PersistenceException{
+    public Promo update(Promo updatedLot) throws PersistenceException{
         Promo promo = promoRepository.getOne(updatedLot.getId());
         if (promo.getStatus() != updatedLot.getStatus()){
             throw new PersistenceException("Not possible to change status");
         }
-        promoRepository.save(updatedLot);
+        return promoRepository.save(updatedLot);
     }
 
     public void delete(int id){

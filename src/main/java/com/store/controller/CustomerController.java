@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import java.util.logging.Logger;
 
 @RestController
@@ -36,7 +37,7 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/customers", method = RequestMethod.POST)
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer){
+    public ResponseEntity<Customer> createCustomer(@Valid @RequestBody Customer customer){
 //        validateCustomerFields(customer);
         if(customer.validate()){
             return new ResponseEntity<Customer>(service.create(customer), HttpStatus.CREATED);
@@ -47,25 +48,25 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/customers", method = RequestMethod.PUT)
-    public ResponseEntity<String> updateCustomer(@RequestBody Customer updatedCustomer){
+    public ResponseEntity<Customer> updateCustomer(@Valid @RequestBody Customer updatedCustomer){
 //        validateCustomerFields(customer);
         if(service.findByDni(updatedCustomer.getDni()) == null){
-            return new ResponseEntity<String>("Customer not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         else{
-            service.update(updatedCustomer);
-            return new ResponseEntity<String>("Customer updated successfully", HttpStatus.OK);
+//            service.update(updatedCustomer);
+            return new ResponseEntity<Customer>(service.update(updatedCustomer), HttpStatus.OK);
         }
     }
 
     @RequestMapping(value = "/customers/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteCustomer(@PathVariable Integer id){
+    public ResponseEntity deleteCustomer(@PathVariable Integer id){
         if(service.findByDni(id) == null){
             return new ResponseEntity<String>("Customer not found", HttpStatus.NOT_FOUND);
         }
         else{
             service.delete(id);
-            return new ResponseEntity<String>("Customer deleted successfully", HttpStatus.OK);
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
     }
 }

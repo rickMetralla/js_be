@@ -3,6 +3,10 @@ package com.store.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
 
@@ -11,19 +15,29 @@ import java.util.Set;
 public class Customer {
 
     @Column(name = "name")
+    @NotNull
+    @Size(min=3, max = 255, message="Name should have at least 3 characters and 255 at most.")
     private String name;
 
     @Id
     @Column(name = "dni")
+    @NotNull
+    @Digits(integer=8, fraction=0, message = "Dni should have 8 digits at most.")
     private int dni;
 
     @Column(name = "address")
+    @NotNull
+    @Size(min=3, max = 255, message="Name should have at least 3 characters and 255 at most.")
     private String address;
 
     @Column(name = "phone")
+    @NotNull
+    @Digits(integer=9, fraction=0, message = "Phone should have 9 digits at most.")
     private int phone;
 
     @Column(name = "email")
+    @NotNull
+    @Pattern(message = "Invalid email field.", regexp = "[A-Za-z0-9._+-]+@[a-z0-9.-]+.[a-z]{2,4}")
     private String email;
 
     public Customer(){

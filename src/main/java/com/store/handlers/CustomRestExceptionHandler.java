@@ -111,16 +111,16 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         RestError apiError = new RestError(
-                HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
+                HttpStatus.INTERNAL_SERVER_ERROR, request.getDescription(true), "[Error] Occurred while: " + request.getContextPath());
         return new ResponseEntity<Object>(
                 apiError, new HttpHeaders(), apiError.getStatus());
     }
 
     /**
-     *
-     * @param ex
-     * @param request
-     * @return
+     * Exception will be thrown as Response Entity catching details of the error.
+     * @param ex Entity Not Found Exception class.
+     * @param request Web Request handled.
+     * @return an Entity Result with error as body and their description.
      */
     @ExceptionHandler({EntityNotFoundException.class})
     public ResponseEntity<Object> handleNotFoundEntity(EntityNotFoundException ex, WebRequest request){

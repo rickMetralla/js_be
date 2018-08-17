@@ -54,32 +54,32 @@ public class PromoController {
 
     Logger LOGGER = LoggerWrapper.getInstance().logger;
 
-    @RequestMapping(value = "/promos/{promoId}/prizedraws", method = RequestMethod.GET)
+    @RequestMapping(value = "/promos/{promoId}/vouchers", method = RequestMethod.GET)
     public ResponseEntity<List<PrizeDraw>> getPrizeDrawByPromoId(@PathVariable int promoId){
         return new ResponseEntity<List<PrizeDraw>>(prizeDrawService.getAllByPromoId(promoId),
                 HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/promos/{promoId}/prizedraws/{winners}", method = RequestMethod.GET)
+    @RequestMapping(value = "/promos/{promoId}/vouchers/{winners}", method = RequestMethod.GET)
     public ResponseEntity<List<PrizeDraw>> getPrizeDrawByPromoId(@PathVariable("promoId") int promoId,
                                                                  @PathVariable("winners") boolean winners){
         return new ResponseEntity<List<PrizeDraw>>(prizeDrawService.getAllWinners(winners, promoId),
                 HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/promoStatus", method = RequestMethod.GET)
+    @RequestMapping(value = "/promos/status", method = RequestMethod.GET)
     public ResponseEntity<List<PromoStatus>> getAllPromoStatus(){
         return new ResponseEntity<List<PromoStatus>>(promoStatusService.getAllStatus(),
                 HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/promoStatus/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/promos/status/{id}", method = RequestMethod.GET)
     public ResponseEntity<PromoStatus> getAllPromoStatus(@RequestParam int id){
         return new ResponseEntity<PromoStatus>(promoStatusService.getOneById(id),
                 HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/promoStatus", method = RequestMethod.POST)
+    @RequestMapping(value = "/promos/status", method = RequestMethod.POST)
     public ResponseEntity<PromoStatus> createPromoStatus(@RequestBody PromoStatus promoStatus){
 //        promoStatusService.createPromoStatus(promoStatus);
         return new ResponseEntity<PromoStatus>(promoStatusService.createPromoStatus(promoStatus), HttpStatus.CREATED);
@@ -158,19 +158,18 @@ public class PromoController {
     }
 
     @RequestMapping(value = "/promos/{idPromo}/complete", method = RequestMethod.PUT)
-    public ResponseEntity<String> completePromo(@PathVariable Integer idPromo){
+    public ResponseEntity<Promo> completePromo(@PathVariable Integer idPromo){
         Promo promo = promoService.findById(idPromo);
         if(promo == null){
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         if(promo.getStatus() == 1){
             promo.setStatus(3);
-            promoService.update(promo);
+//            promoService.update(promo);
         }else{
-            return new ResponseEntity<String>("Completion of promo not allowed, active status required",
-                    HttpStatus.METHOD_NOT_ALLOWED);
+            return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
-        return new ResponseEntity<String>("Completion of promo completed", HttpStatus.OK);
+        return new ResponseEntity<Promo>(promoService.update(promo), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/promos/{idPromo}/inactive", method = RequestMethod.PUT)
