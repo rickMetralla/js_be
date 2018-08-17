@@ -51,6 +51,6 @@ public class PrizeRankController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Prize> savePrize(@RequestBody Prize prize){
 //        validatePrizeFields(prize);
-        return new ResponseEntity<Prize>(prizeService.create(prize), HttpStatus.OK);
+        return new ResponseEntity<Prize>(prizeService.create(prize), HttpStatus.CREATED);
     }
 }

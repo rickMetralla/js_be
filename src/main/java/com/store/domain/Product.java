@@ -32,9 +32,15 @@ public class Product {
     @Column(name = "stock")
     private int stock;
 
-//    @Column(name = "date_created")
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
-//    private Date dateCreated;
+    public Product(){
+    }
+
+    public Product(int id, String name, String model, int stock){
+        this.id = id;
+        this.name = name;
+        this.model = model;
+        this.stock = stock;
+    }
 
     public String getModel() {
         return model;

@@ -1,5 +1,6 @@
 package com.store.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.store.domain.Customer;
 import com.store.service.CustomerService;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import static org.hamcrest.Matchers.*; //can be used with *
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -94,4 +96,29 @@ public class CustomerControllerTest {
        verifyNoMoreInteractions(customerService);
    }
 
+   @Test
+   public void createCustomerTest() throws Exception{
+       Customer customer = new Customer("rick", 223123, "calle", 54466, "rick@rick.com");
+       given(customerService.create(customer)).willReturn(customer);
+
+       controllerMvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+               .content(asJsonString(customer)))
+               .andExpect(status().isCreated());
+//               .andExpect(jsonPath("$.dni", is(customer.getDni())))
+//               .andExpect(jsonPath("$.address", is(customer.getAddress())))
+//               .andExpect(jsonPath("$.phone", is(customer.getPhone())))
+//               .andExpect(jsonPath("$.email", is(customer.getEmail())))
+//               .andExpect(jsonPath("$.name", is(customer.getName())));
+
+//       verify(customerService, times(1)).create(customer);
+//       verifyNoMoreInteractions(customerService);
+   }
+
+    static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

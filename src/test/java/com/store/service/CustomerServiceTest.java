@@ -79,11 +79,11 @@ public class CustomerServiceTest {
         when(customerRepository.save(expectedCustomer))
                 .thenReturn(new Customer("rick metralla", 6432037, "Av. Villazon", 76907520, "rick@metralla.com"));
         Customer actual = customerService.create(expectedCustomer);
-        assertEquals("[Error] Expected and actual customer are different", expectedCustomer.getName(), actual.getName());
-        assertEquals("[Error] Expected and actual customer are different", expectedCustomer.getDni(), actual.getDni());
-        assertEquals("[Error] Expected and actual customer are different", expectedCustomer.getName(), actual.getName());
-        assertEquals("[Error] Expected and actual customer are different", expectedCustomer.getName(), actual.getName());
-        assertEquals("[Error] Expected and actual customer are different", expectedCustomer.getName(), actual.getName());
+        assertEquals("[Error] Expected and actual name customer are different", expectedCustomer.getName(), actual.getName());
+        assertEquals("[Error] Expected and actual dni customer are different", expectedCustomer.getDni(), actual.getDni());
+        assertEquals("[Error] Expected and actual address customer are different", expectedCustomer.getAddress(), actual.getAddress());
+        assertEquals("[Error] Expected and actual phone customer are different", expectedCustomer.getPhone(), actual.getPhone());
+        assertEquals("[Error] Expected and actual email customer are different", expectedCustomer.getEmail(), actual.getEmail());
     }
 
     @Test
