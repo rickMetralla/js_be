@@ -3,10 +3,7 @@ package com.store.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Set;
 
@@ -15,19 +12,21 @@ import java.util.Set;
 public class Customer {
 
     @Column(name = "name")
-    @NotNull
-    @Size(min=3, max = 255, message="Name should have at least 3 characters and 255 at most.")
+    @NotNull(message = "{validation.name.null}")
+    @NotBlank(message = "{validation.name.empty}")
+    @Size(min = 3, max = 255, message = "{validation.name.size}")
     private String name;
 
     @Id
     @Column(name = "dni")
     @NotNull
+    @NotEmpty
     @Digits(integer=8, fraction=0, message = "Dni should have 8 digits at most.")
     private int dni;
 
     @Column(name = "address")
     @NotNull
-    @Size(min=3, max = 255, message="Name should have at least 3 characters and 255 at most.")
+    @Size(min=3, max = 255, message = "{validation.name.size}")
     private String address;
 
     @Column(name = "phone")

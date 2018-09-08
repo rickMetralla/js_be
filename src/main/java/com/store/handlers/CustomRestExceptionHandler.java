@@ -1,5 +1,6 @@
 package com.store.handlers;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
                 ex, apiError, headers, apiError.getStatus(), request);
     }
 
-    @ExceptionHandler({ ConstraintViolationException.class })
+    @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex, WebRequest request) {
         List<String> errors = new ArrayList<String>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
@@ -54,6 +55,17 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
                 new RestError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
         return new ResponseEntity<Object>(
                 apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex,
+                                                                  WebRequest request) {
+        if (ex.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
+            return new ResponseEntity<Object>(new RestError(HttpStatus.CONFLICT, "Database error", ex.getCause().getMessage()),new HttpHeaders(), HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<Object>(new RestError(HttpStatus.CONFLICT, "Database error", ex.getRootCause().getLocalizedMessage()),
+              new HttpHeaders(), HttpStatus.CONFLICT);
+
     }
 
     @ExceptionHandler({ MethodArgumentTypeMismatchException.class })
