@@ -1,5 +1,6 @@
 package com.store.handlers;
 
+import com.store.config.StaticUtils;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
@@ -22,7 +23,7 @@ public class RestError {
         super();
         this.setStatus(status);
         this.setMessage(message);
-        setErrors(Arrays.asList(error));
+        this.setErrors(Arrays.asList(error));
     }
 
     public HttpStatus getStatus() {
@@ -46,6 +47,9 @@ public class RestError {
     }
 
     public void setErrors(List<String> errors) {
-        this.errors = errors;
+
+        boolean developmentEnv = StaticUtils.getProperty();
+        if(developmentEnv)
+            this.errors = errors;
     }
 }

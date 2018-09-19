@@ -19,9 +19,9 @@ public class Customer {
 
     @Id
     @Column(name = "dni")
-    @NotNull
-    @NotEmpty
-    @Digits(integer=8, fraction=0, message = "Dni should have 8 digits at most.")
+//    @NotNull
+//    @NotEmpty
+    @Digits(integer=8, fraction=0, message = "{validation.digits.size}")
     private int dni;
 
     @Column(name = "address")
